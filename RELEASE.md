@@ -14,9 +14,11 @@ A release needs Dennis' explicit "RELEASE GO" and a passed security gate.
    git push fork 8.2.0
    ```
 
-The tag starts two workflows:
+The tag starts three workflows. Each first checks that the tagged commit is
+on `main` and stops otherwise:
 
-- `publish-to-pypi.yml` builds the package and uploads it to PyPI with
+- `publish-to-pypi.yml` checks that the tag matches the version in
+  `pyproject.toml`, runs the unit tests, builds the package and uploads it to PyPI with
   Trusted Publishing (environment `pypi`, no API token), then creates the
   GitHub release.
 - `publish-docker.yml` builds the image for amd64 and arm64 and pushes

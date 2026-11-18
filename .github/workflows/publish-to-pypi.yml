@@ -20,6 +20,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # history and origin/main for the main check
+      - name: the tag must be on main
+        run: |
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main ||
+            { echo "::error::tag $GITHUB_REF_NAME is not on main"; exit 1; }
       - name: Set up Python 3.12
         uses: actions/setup-python@v7
         with:
@@ -27,19 +33,16 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install python3-poetry
-      - name: Build
+      - name: Test and build
         run: |
+          [ "$(poetry version -s)" = "$GITHUB_REF_NAME" ] ||
+            { echo "::error::tag $GITHUB_REF_NAME does not match the version in pyproject.toml"; exit 1; }
           poetry install --with=test --extras mcp
+          poetry run pytest -q
           poetry build
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@v1.14.3
       - name: Create release in GitHub
-        id: create_release
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --generate-notes
