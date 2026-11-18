@@ -60,7 +60,14 @@ docker run -it \
 ```
 Note: you must provide a secret key! Generate one for example by running `ruby -e "require 'securerandom'; puts SecureRandom.hex(32)"`.
 
+The container runs as an unprivileged user. Where it may not bind port 80 (e.g. rootless Podman), set
+`PUPPETBOARD_PORT=8080` and publish that port.
+
 Optionally you can set `PUPPETBOARD_URL_PREFIX` env variable to a value like `/puppetboard` to run the app under a URL prefix.
+
+The image can also serve a read-only JSON API (`-e ENABLE_API=true`) and an MCP server for AI assistants
+(`-e ENABLE_MCP=true -e MCP_ALLOWED_HOSTS=puppetboard.example.com`). Both have no authentication of their own,
+so put a TLS reverse proxy with authentication in front. See [docs/API.md](docs/API.md).
 
 You can use the following Puppet Code to have Puppetboard managed by Puppet:
 
@@ -182,7 +189,9 @@ Actively maintained packages:
 
 ### Manually
 
-You can also install the package from PyPI and configure a WSGI-capable application server to serve it.
+You can also install the package from PyPI and configure a WSGI-capable application server to serve it
+(`puppetboard.app:app`). For the MCP server use the ASGI entry point `puppetboard.asgi:app` instead, see
+[Deployment setups](docs/Deployment-setups.md#nginx--gunicorn-asgi-worker-json-api-and-mcp-server).
 
 We recommend using virtualenv to provide a separate environment for the app.
 
@@ -309,6 +318,10 @@ Other settings that might be interesting, in no particular order:
     in the last report. Otherwise shows only 'some' string if there are resources with given status. Setting this
     to `False` gives performance benefits, especially in big Puppet environments (more than few hundreds of nodes).
     Defaults to `True`.
+- `ENABLE_API`: If set to `True` serves the read-only JSON API under `/api/v1/`. Defaults to `False`.
+    See [docs/API.md](docs/API.md) for the endpoints and the `API_*` settings.
+- `ENABLE_MCP`: If set to `True` serves a read-only MCP server under `/mcp` (ASGI entry point only).
+    Needs `MCP_ALLOWED_HOSTS`. Defaults to `False`. See [docs/API.md](docs/API.md).
 - `ENABLE_CLASS`: If set to `True` allows the user to view the number of resource events (number of changed resources in the last report) grouped by class.
     The resource events are grouped by their status ('failure', 'success', 'noop').
 - `CLASS_EVENTS_STATUS_COLUMNS`: A mapping between the status of the resource events and the name of the columns of the table to display.
@@ -390,7 +403,7 @@ We welcome contributions to this project. However, there are a few ground rules 
 ### License
 
 This project is licensed under the Apache v2.0 License. As such, your contributions, once accepted, are automatically
-covered by this license.
+covered by this license. Bundled third-party files and their licenses are listed in [THIRD_PARTY.md](THIRD_PARTY.md).
 
 ### Commit messages
 

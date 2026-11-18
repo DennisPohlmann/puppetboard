@@ -9,6 +9,7 @@ To run Puppetboard in production we provide instructions for the following scena
 -   Apache + mod\_passenger
 -   nginx + uwsgi
 -   nginx + gunicorn
+-   nginx + gunicorn ASGI worker (needed for the MCP server)
 
 If you deploy Puppetboard through a different setup we'd welcome a pull request that adds the instructions to this section.
 
@@ -320,6 +321,30 @@ chdir   = '/usr/lib/pythonX.Y/site-packages/puppetboard'
 raw_env = ['PUPPETBOARD_SETTINGS=/var/www/puppetboard/settings.py', 'http_proxy=']
 ```
 
+## nginx + gunicorn ASGI worker (JSON API and MCP server)
+
+The MCP server on `/mcp` needs the ASGI entry point; it serves the web
+interface and the JSON API as well. Install the extra dependencies and run it
+with gunicorn's built-in ASGI worker:
+
+```bash
+$ pip install -r requirements-docker.txt .
+$ gunicorn -k asgi -b 127.0.0.1:9090 puppetboard.asgi:app
+```
+
+In the settings enable the features and name the host the clients use:
+
+```python
+ENABLE_API = True
+ENABLE_MCP = True
+MCP_ALLOWED_HOSTS = ['puppetboard.example.com']
+```
+
+Neither the API nor the MCP server authenticates clients, so put TLS and
+authentication in front of them, see below and [docs/API.md](API.md). With
+a URL prefix use `--root-path /puppetboard`. On RHEL 10 the system Python 3.12
+is enough.
+
 # Security
 
 If you wish to make users authenticate before getting access to Puppetboard you can use one of the following configuration snippets.
@@ -340,7 +365,7 @@ Inside the `VirtualHost`:
 
 ## nginx
 
-Inside the `location / {}` block that has the `uwsgi_pass` directive:
+Inside the `location / {}` block that has the `uwsgi_pass` or `proxy_pass` directive:
 
 ``` {.sourceCode .nginx}
 auth_basic "Puppetboard";
