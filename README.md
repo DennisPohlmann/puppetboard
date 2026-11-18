@@ -54,15 +54,17 @@ You can run the app on your PuppetDB host with this command:
 docker run -it \
   -e PUPPETDB_HOST=localhost \
   -e PUPPETDB_PORT=8080 \
+  -e PUPPETBOARD_PORT=8088 \
   -e SECRET_KEY=XXXXXXXX \
   --net=host \
   ghcr.io/voxpupuli/puppetboard
 ```
+With `--net=host` next to PuppetDB, `PUPPETBOARD_PORT` must differ from PuppetDB's port 8080.
 Note: you must provide a secret key! Generate one for example by running `ruby -e "require 'securerandom'; puts SecureRandom.hex(32)"`.
 
 The image is based on Chainguard's minimal Python image: it has no shell and no package manager
-(`docker exec ... sh` does not work) and runs as an unprivileged user. Where it may not bind port 80 (e.g. rootless Podman), set
-`PUPPETBOARD_PORT=8080` and publish that port.
+(`docker exec ... sh` does not work) and runs as the unprivileged user `puppetboard` (uid 10001). It listens on
+port **8080** (`PUPPETBOARD_PORT`); images before this change used port 80, so adjust your port mapping or proxy.
 
 Optionally you can set `PUPPETBOARD_URL_PREFIX` env variable to a value like `/puppetboard` to run the app under a URL prefix.
 
@@ -173,7 +175,7 @@ The following is a list of OpenShift parameters that you can pass to the ``oc`` 
 - `PUPPETDB_HOST`: This is the name of the PuppetDB host that Puppetboard will query for its reports.  Defaults to 'puppetdb'.
 - `PUPPETDB_PORT`: This is tcp port on the `PUPPETDB_HOST` for queries.  Defaults to '8080'.
 - `PUPPETBOARD_SECRET_KEY`: Identical to `SECRET_KEY` (below).  Defaults to 'Secr3t_K3y'.
-- `PUPPETBOARD_PORT`: The TCP port on which the Puppetboard docker image presents the web interface.  This is not the
+- `PUPPETBOARD_PORT`: The TCP port on which the Puppetboard docker image presents the web interface (container default 8080).  This is not the
     user-facing web interface.  Rather, it's the port that the OpenShift route forwards **to**.  
 - `SERVICE_PORT`: The TCP port on which the Puppetboard service offers its user-facing web interface on OpenShift.  Defaults to '80'.
 - `PUPPETBOARD_SOURCE_REPOSITORY_URL`: The URL to the Puppetboard repository.  Defaults to 'https://github.com/voxpupuli/puppetboard.git'.

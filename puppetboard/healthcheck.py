@@ -5,7 +5,7 @@ import urllib.request
 
 
 def url():
-    return (f"http://localhost:{os.getenv('PUPPETBOARD_PORT', '80')}"
+    return (f"http://localhost:{os.getenv('PUPPETBOARD_PORT', '8080')}"
             f"{os.getenv('PUPPETBOARD_URL_PREFIX', '')}"
             f"{os.getenv('PUPPETBOARD_STATUS_ENDPOINT', '/status')}")
 

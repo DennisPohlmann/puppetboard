@@ -20,7 +20,7 @@ def test_gunicorn_conf_defaults(monkeypatch):
         monkeypatch.delenv(name, raising=False)
     from puppetboard import gunicorn_conf
     conf = importlib.reload(gunicorn_conf)
-    assert (conf.bind, conf.workers, conf.root_path) == ('0.0.0.0:80', 1, '')
+    assert (conf.bind, conf.workers, conf.root_path) == ('0.0.0.0:8080', 1, '')
 
 
 def test_healthcheck_url(monkeypatch):
