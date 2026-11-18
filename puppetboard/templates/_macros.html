@@ -136,10 +136,10 @@
   });
 
   {% if table_html_id == 'query_table' -%}
-  table.buttons().container().appendTo( $('div.dataTables_length', table.table().container()) );
+  table.buttons().container().appendTo( $('div.dt-length', table.table().container()) );
   {% endif %}
 
-  table.on('error', function ( e, settings, json ) {
+  table.on('dt-error', function ( e, settings, json ) {
     table.clear().draw();
     $('#facts_table_processing').hide(); })
 
@@ -151,9 +151,9 @@
   // Override Datatables search box events to delay Ajax call while writing
   var searchWait = 0;
   var searchWaitInterval;
-  $('.dataTables_filter input')
-  .unbind()
-  .bind('input', function(e){
+  $('.dt-search input')
+  .off()
+  .on('input', function(e){
     var item = $(this);
     searchWait = 0;
     if(!searchWaitInterval) searchWaitInterval = setInterval(function(){

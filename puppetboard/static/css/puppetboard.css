@@ -237,7 +237,7 @@
 }
 
 /* DataTables in dark mode - ensure proper dark styling */
-[data-theme="dark"] .dataTables_wrapper {
+[data-theme="dark"] .dt-container {
   color: var(--color-text);
 }
 
@@ -308,53 +308,44 @@
   border-left-color: var(--color-border) !important;      /* #3c3c40 */
 }
 
-/* DataTables sorting icons — default opacity 0.125 is invisible on dark headers; raise it */
-[data-theme="dark"] table.dataTable thead > tr > th.sorting::before,
-[data-theme="dark"] table.dataTable thead > tr > th.sorting::after,
-[data-theme="dark"] table.dataTable thead > tr > th.sorting_asc::before,
-[data-theme="dark"] table.dataTable thead > tr > th.sorting_asc::after,
-[data-theme="dark"] table.dataTable thead > tr > th.sorting_desc::before,
-[data-theme="dark"] table.dataTable thead > tr > th.sorting_desc::after,
-[data-theme="dark"] table.dataTable thead > tr > th.sorting_asc_disabled::before,
-[data-theme="dark"] table.dataTable thead > tr > th.sorting_desc_disabled::after,
-[data-theme="dark"] table.dataTable thead > tr > td.sorting::before,
-[data-theme="dark"] table.dataTable thead > tr > td.sorting::after,
-[data-theme="dark"] table.dataTable thead > tr > td.sorting_asc::before,
-[data-theme="dark"] table.dataTable thead > tr > td.sorting_asc::after,
-[data-theme="dark"] table.dataTable thead > tr > td.sorting_desc::before,
-[data-theme="dark"] table.dataTable thead > tr > td.sorting_desc::after {
+/* DataTables sorting icons — default opacity is invisible on dark headers; raise it */
+[data-theme="dark"] table.dataTable thead > tr > th.dt-orderable-asc .dt-column-order::before,
+[data-theme="dark"] table.dataTable thead > tr > th.dt-orderable-desc .dt-column-order::after,
+[data-theme="dark"] table.dataTable thead > tr > td.dt-orderable-asc .dt-column-order::before,
+[data-theme="dark"] table.dataTable thead > tr > td.dt-orderable-desc .dt-column-order::after {
   opacity: 0.40 !important;
   color: var(--color-text) !important;
 }
 
 /* Active sort direction — more prominent */
-[data-theme="dark"] table.dataTable thead > tr > th.sorting_asc::before,
-[data-theme="dark"] table.dataTable thead > tr > th.sorting_desc::after,
-[data-theme="dark"] table.dataTable thead > tr > td.sorting_asc::before,
-[data-theme="dark"] table.dataTable thead > tr > td.sorting_desc::after {
+[data-theme="dark"] table.dataTable thead > tr > th.dt-ordering-asc .dt-column-order::before,
+[data-theme="dark"] table.dataTable thead > tr > th.dt-ordering-desc .dt-column-order::after,
+[data-theme="dark"] table.dataTable thead > tr > td.dt-ordering-asc .dt-column-order::before,
+[data-theme="dark"] table.dataTable thead > tr > td.dt-ordering-desc .dt-column-order::after {
   opacity: 0.85 !important;
 }
 
 /* DataTables pagination dark mode */
-[data-theme="dark"] .dataTables_paginate .paginate_button {
+[data-theme="dark"] .dt-paging .dt-paging-button {
   color: var(--color-text) !important;
   background-color: var(--color-table-bg) !important;
   border-color: var(--color-border) !important;
 }
 
-[data-theme="dark"] .dataTables_paginate .paginate_button:hover {
+[data-theme="dark"] .dt-paging .dt-paging-button:hover {
   color: var(--color-text) !important;
   background-color: var(--color-bg-secondary) !important;
   border-color: var(--color-border) !important;
 }
 
-[data-theme="dark"] .dataTables_paginate .paginate_button.current {
+[data-theme="dark"] .dt-paging .dt-paging-button.current,
+[data-theme="dark"] .dt-paging .dt-paging-button.active {
   color: #fff !important;
   background: var(--color-darkblue) !important;
   border-color: var(--color-darkblue) !important;
 }
 
-[data-theme="dark"] .dataTables_paginate .paginate_button.disabled {
+[data-theme="dark"] .dt-paging .dt-paging-button.disabled {
   color: var(--color-text-muted) !important;
   background-color: var(--color-table-bg) !important;
 }
@@ -569,28 +560,29 @@
   color: var(--color-text-muted);
 }
 
-[data-theme="dark"] .dataTables_wrapper .dataTables_filter input,
-[data-theme="dark"] .dataTables_wrapper .dataTables_length select {
+[data-theme="dark"] .dt-container .dt-search input,
+[data-theme="dark"] .dt-container .dt-length select {
   background-color: var(--color-input-bg);
   color: var(--color-text);
   border-color: var(--color-border);
 }
 
-[data-theme="dark"] .dataTables_wrapper .dataTables_info,
-[data-theme="dark"] .dataTables_wrapper .dataTables_paginate {
+[data-theme="dark"] .dt-container .dt-info,
+[data-theme="dark"] .dt-container .dt-paging {
   color: var(--color-text);
 }
 
-[data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
+[data-theme="dark"] .dt-container .dt-paging .dt-paging-button {
   color: var(--color-text) !important;
 }
 
-[data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+[data-theme="dark"] .dt-container .dt-paging .dt-paging-button:hover {
   background: var(--color-bg-secondary) !important;
   color: var(--color-text) !important;
 }
 
-[data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+[data-theme="dark"] .dt-container .dt-paging .dt-paging-button.current,
+[data-theme="dark"] .dt-container .dt-paging .dt-paging-button.active {
   background: var(--color-darkblue) !important;
   color: #fff !important;
 }
@@ -948,7 +940,7 @@ td.code {
   color:#fff!important
 }
 
-.dataTables_length > label {
+.dt-length > label {
   margin-right: 1em;
 }
 

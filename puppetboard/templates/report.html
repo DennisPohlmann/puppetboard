@@ -150,16 +150,7 @@ var logs_table = $('#logs_table').DataTable({
         },
     ],
 
-    dom: "<'ui stackable grid'"+
-            "<'row'"+
-                "<'eight wide column'B>"+
-                "<'right aligned eight wide column'f>"+
-            ">"+
-            "<'row dt-table'"+
-                "<'sixteen wide column'tr>"+
-            ">"+
-            "<'row'>"+
-        ">",
+    layout: { topStart: 'buttons', topEnd: 'search', bottomStart: null, bottomEnd: null },
 });
 
 // on any button click show the clicked button as active and all other button(s) as inactive
@@ -195,16 +186,7 @@ var events_table = $('#events_table').DataTable({
         }
     },
 
-    dom: "<'ui stackable grid'"+
-            "<'row'"+
-                "<'eight wide column'B>"+
-                "<'right aligned eight wide column'f>"+
-            ">"+
-            "<'row dt-table'"+
-                "<'sixteen wide column'tr>"+
-            ">"+
-            "<'row'>"+
-        ">",
+    layout: { topStart: 'buttons', topEnd: 'search', bottomStart: null, bottomEnd: null },
 });
 
 var metrics_table = $('#metrics_table').DataTable({
