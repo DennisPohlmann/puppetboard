@@ -1,0 +1,215 @@
+# Default values for the Puppetboard chart.
+# Every key is documented in README.md and checked by values.schema.json.
+# Puppetboard only: PuppetDB is yours, the chart connects to it with host,
+# port and a client certificate.
+
+# -- Partial override of the resource names (keeps the release name).
+nameOverride: ""
+# -- Full override of the resource names.
+fullnameOverride: ""
+
+# -- Labels added to every resource, the pods included.
+commonLabels: {}
+# -- Annotations added to every resource (not to the pods; see podAnnotations).
+commonAnnotations: {}
+
+image:
+  # -- Image registry.
+  registry: ghcr.io
+  # -- Image repository.
+  repository: dennispohlmann/puppetboard
+  # -- Image tag (default: the chart's appVersion).
+  tag: ""
+  # -- Image digest (`sha256:...`); wins over the tag.
+  digest: ""
+  # -- Pull policy.
+  pullPolicy: IfNotPresent
+
+# -- Pull secrets, e.g. `[{name: regcred}]`.
+imagePullSecrets: []
+
+# -- Pods. Rate limit and environment cache count per pod.
+replicaCount: 1
+# -- Old ReplicaSets kept for rollbacks.
+revisionHistoryLimit: 10
+
+# -- Annotations of the pods.
+podAnnotations: {}
+# -- Labels of the pods (in addition to commonLabels).
+podLabels: {}
+
+# -- Secret key for sessions and CSRF: a long random string, the same for all
+# pods. Required unless existingSecret is set. `openssl rand -hex 32`
+secretKey: ""
+# -- Existing Secret with the key `SECRET_KEY` instead of secretKey.
+existingSecret: ""
+
+puppetdb:
+  # -- PuppetDB host name, as in its certificate.
+  host: puppetdb
+  # -- PuppetDB port: 8081 for TLS, 8080 for plain HTTP (inside a trusted network only).
+  port: 8081
+  # -- Verify PuppetDB's certificate with the CA from tls (true), or not (false).
+  sslVerify: true
+  # -- Seconds per PuppetDB request.
+  timeout: 20
+  tls:
+    # -- Use a client certificate (needed for PuppetDB over TLS).
+    enabled: true
+    # -- Existing Secret with `ca.crt`, `tls.crt` and `tls.key` (e.g. from cert-manager).
+    existingSecret: ""
+    # -- PEM of the Puppet CA (when no existingSecret).
+    ca: ""
+    # -- PEM of Puppetboard's client certificate (when no existingSecret).
+    cert: ""
+    # -- PEM of Puppetboard's private key (when no existingSecret).
+    key: ""
+
+api:
+  # -- Read-only JSON API under /api/v1/. No authentication of its own: only
+  # behind an ingress with authentication.
+  enabled: false
+  # -- Requests per minute and client (API and MCP each), 0 = off.
+  rateLimit: 120
+
+mcp:
+  # -- Read-only MCP server under /mcp. No authentication of its own: only
+  # behind an ingress with authentication.
+  enabled: false
+  # -- Host names MCP clients use, without port. Empty: the ingress and
+  # httpRoute hosts.
+  allowedHosts: []
+  # -- Origin headers accepted on /mcp, e.g. `https://puppetboard.example.com`.
+  allowedOrigins: []
+
+# -- Further Puppetboard settings as environment variables, with the names
+# of the README ("App settings"). Values are passed as strings. Sensitive
+# values belong into a Secret via extraEnvFrom.
+# @default -- see values.yaml
+config:
+  DEFAULT_ENVIRONMENT: production
+  OFFLINE_MODE: "true"
+  ENABLE_QUERY: "true"
+  ENABLE_CATALOG: "false"
+  ENABLE_CLASS: "false"
+  UNRESPONSIVE_HOURS: "2"
+  LOGLEVEL: info
+
+# -- Gunicorn workers per pod.
+workers: 2
+
+# -- Extra environment variables (list of EnvVar).
+extraEnv: []
+# -- Extra env sources, e.g. `[{secretRef: {name: puppetboard-extra}}]`.
+extraEnvFrom: []
+# -- Extra volumes of the pod.
+extraVolumes: []
+# -- Extra volume mounts of the container.
+extraVolumeMounts: []
+
+serviceAccount:
+  # -- Create a ServiceAccount.
+  create: true
+  # -- Name (default: the full name).
+  name: ""
+  # -- Puppetboard does not talk to the Kubernetes API.
+  automountServiceAccountToken: false
+  # -- Annotations of the ServiceAccount.
+  annotations: {}
+
+# -- Pod security context.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Container security context.
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: [ALL]
+
+service:
+  # -- Service type.
+  type: ClusterIP
+  # -- Service port.
+  port: 80
+  # -- Annotations of the Service.
+  annotations: {}
+
+ingress:
+  # -- Create an Ingress.
+  enabled: false
+  # -- IngressClass, e.g. nginx.
+  className: ""
+  # -- Annotations, e.g. for Basic-Auth with ingress-nginx:
+  # `nginx.ingress.kubernetes.io/auth-type: basic`,
+  # `nginx.ingress.kubernetes.io/auth-secret: puppetboard-basic-auth`.
+  annotations: {}
+  # -- Hosts and paths.
+  hosts:
+    - host: puppetboard.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  # -- TLS, e.g. `[{secretName: puppetboard-tls, hosts: [puppetboard.example.com]}]`.
+  tls: []
+
+httpRoute:
+  # -- Create a Gateway API HTTPRoute.
+  enabled: false
+  # -- Gateways, e.g. `[{name: gateway, namespace: infra}]`.
+  parentRefs: []
+  # -- Host names.
+  hostnames: []
+  # -- Annotations of the HTTPRoute.
+  annotations: {}
+
+networkPolicy:
+  # -- Create a NetworkPolicy: ingress only on the HTTP port, egress only to
+  # DNS and PuppetDB's port.
+  enabled: false
+  # -- Who may connect (list of NetworkPolicyPeer); empty: anyone in the cluster.
+  ingressFrom: []
+  # -- Where PuppetDB is (list of NetworkPolicyPeer); empty: anywhere on its port.
+  puppetdbTo: []
+
+podDisruptionBudget:
+  # -- Create a PodDisruptionBudget (useful with replicaCount > 1).
+  enabled: false
+  # -- Minimum available pods.
+  minAvailable: 1
+
+# -- Resources of the container.
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    memory: 512Mi
+
+# -- Liveness probe.
+livenessProbe:
+  httpGet:
+    path: /status
+    port: http
+  periodSeconds: 30
+  timeoutSeconds: 5
+# -- Readiness probe.
+readinessProbe:
+  httpGet:
+    path: /status
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 5
+
+# -- Node selector.
+nodeSelector: {}
+# -- Tolerations.
+tolerations: []
+# -- Affinity.
+affinity: {}

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+{{ include "puppetboard.metadata" (dict "context" . "name" (include "puppetboard.fullname" .) "annotations" .Values.service.annotations) }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "puppetboard.selectorLabels" . | nindent 4 }}

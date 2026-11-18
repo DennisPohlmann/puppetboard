@@ -1,0 +1,45 @@
+# Everything on: TLS client certificate from a Secret, API and MCP behind an
+# ingress with Basic-Auth, HTTPRoute, NetworkPolicy and PDB.
+replicaCount: 2
+existingSecret: puppetboard-secret
+puppetdb:
+  host: puppetdb.example.com
+  port: 8081
+  tls:
+    existingSecret: puppetboard-puppetdb-tls
+api:
+  enabled: true
+mcp:
+  enabled: true
+  allowedOrigins: [https://puppetboard.example.com]
+config:
+  DEFAULT_ENVIRONMENT: "*"
+  ENABLE_CATALOG: "true"
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: puppetboard-basic-auth
+  hosts:
+    - host: puppetboard.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: puppetboard-tls
+      hosts: [puppetboard.example.com]
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: gateway
+      namespace: infra
+  hostnames: [puppetboard.internal.example.com]
+networkPolicy:
+  enabled: true
+  ingressFrom:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+podDisruptionBudget:
+  enabled: true

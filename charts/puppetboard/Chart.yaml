@@ -1,0 +1,24 @@
+apiVersion: v2
+name: puppetboard
+description: >-
+  Puppetboard - web frontend, read-only JSON API and MCP server for an
+  existing PuppetDB.
+type: application
+# Released together with the app: chart and app version follow the release tag.
+version: 8.1.0
+appVersion: "8.1.0"
+kubeVersion: ">=1.25.0-0"
+home: https://github.com/DennisPohlmann/puppetboard
+sources:
+  - https://github.com/DennisPohlmann/puppetboard
+icon: https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/puppetboard/static/favicon.svg
+keywords:
+  - puppet
+  - puppetdb
+  - puppetboard
+  - mcp
+maintainers:
+  - name: DennisPohlmann
+    url: https://github.com/DennisPohlmann
+annotations:
+  artifacthub.io/license: Apache-2.0

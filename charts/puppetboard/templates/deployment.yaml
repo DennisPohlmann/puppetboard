@@ -1,0 +1,152 @@
+{{- include "puppetboard.validate" . -}}
+apiVersion: apps/v1
+kind: Deployment
+{{ include "puppetboard.metadata" (dict "context" . "name" (include "puppetboard.fullname" .)) }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "puppetboard.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "puppetboard.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        # Settings are read at start: a change rolls the pods.
+        checksum/config: {{ toYaml (list .Values.config .Values.puppetdb .Values.api .Values.mcp .Values.workers) | sha256sum }}
+        checksum/secret: {{ toYaml (list .Values.secretKey .Values.existingSecret) | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "puppetboard.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
+      enableServiceLinks: false
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: puppetboard
+          image: {{ include "puppetboard.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PUPPETBOARD_PORT
+              value: "8080"
+            - name: PUPPETBOARD_WORKERS
+              value: {{ .Values.workers | quote }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "puppetboard.secretName" . }}
+                  key: SECRET_KEY
+            - name: PUPPETDB_HOST
+              value: {{ .Values.puppetdb.host | quote }}
+            - name: PUPPETDB_PORT
+              value: {{ .Values.puppetdb.port | quote }}
+            - name: PUPPETDB_TIMEOUT
+              value: {{ .Values.puppetdb.timeout | quote }}
+            {{- if .Values.puppetdb.tls.enabled }}
+            - name: PUPPETDB_SSL_VERIFY
+              value: {{ ternary "/etc/puppetboard/ssl/ca.crt" "false" .Values.puppetdb.sslVerify | quote }}
+            - name: PUPPETDB_CERT
+              value: /etc/puppetboard/ssl/tls.crt
+            - name: PUPPETDB_KEY
+              value: /etc/puppetboard/ssl/tls.key
+            {{- else }}
+            - name: PUPPETDB_SSL_VERIFY
+              value: {{ .Values.puppetdb.sslVerify | quote }}
+            {{- end }}
+            - name: ENABLE_API
+              value: {{ .Values.api.enabled | quote }}
+            - name: API_RATE_LIMIT
+              value: {{ .Values.api.rateLimit | quote }}
+            - name: ENABLE_MCP
+              value: {{ .Values.mcp.enabled | quote }}
+            {{- if .Values.mcp.enabled }}
+            - name: MCP_ALLOWED_HOSTS
+              value: {{ include "puppetboard.mcpAllowedHosts" . | quote }}
+            - name: MCP_ALLOWED_ORIGINS
+              value: {{ join "," .Values.mcp.allowedOrigins | quote }}
+            {{- end }}
+            {{- range $name, $value := .Values.config }}
+            {{- if not (kindIs "invalid" $value) }}
+            - name: {{ $name }}
+              value: {{ $value | toString | quote }}
+            {{- end }}
+            {{- end }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.extraEnvFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            # read-only root file system: gunicorn and Python need these
+            - name: tmp
+              mountPath: /tmp
+            - name: home
+              mountPath: /home/puppetboard
+            {{- if .Values.puppetdb.tls.enabled }}
+            - name: puppetdb-tls
+              mountPath: /etc/puppetboard/ssl
+              readOnly: true
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: home
+          emptyDir: {}
+        {{- if .Values.puppetdb.tls.enabled }}
+        - name: puppetdb-tls
+          secret:
+            secretName: {{ include "puppetboard.tlsSecretName" . }}
+            defaultMode: 0400
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}

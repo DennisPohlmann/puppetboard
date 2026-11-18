@@ -1,0 +1,14 @@
+Puppetboard {{ include "puppetboard.imageTag" . }} for PuppetDB {{ .Values.puppetdb.host }}:{{ .Values.puppetdb.port }}.
+{{- if .Values.ingress.enabled }}
+{{- range .Values.ingress.hosts }}
+  URL: http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}/
+{{- end }}
+{{- else }}
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "puppetboard.fullname" . }} 8080:{{ .Values.service.port }}
+  then open http://127.0.0.1:8080/
+{{- end }}
+{{- if or .Values.api.enabled .Values.mcp.enabled }}
+
+JSON API ({{ .Values.api.enabled }}) and MCP server ({{ .Values.mcp.enabled }}) have no authentication
+of their own: make sure the ingress or gateway in front asks for it.
+{{- end }}

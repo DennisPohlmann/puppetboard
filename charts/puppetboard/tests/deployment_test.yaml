@@ -1,0 +1,101 @@
+suite: deployment
+templates:
+  - templates/deployment.yaml
+values:
+  - ../ci/default-values.yaml
+tests:
+  - it: runs the ghcr.io image as user puppetboard on 8080 with a read-only root
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/dennispohlmann/puppetboard:8.1.0
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 10001
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content: {name: http, containerPort: 8080, protocol: TCP}
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+  - it: takes SECRET_KEY from the chart's Secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SECRET_KEY
+            valueFrom: {secretKeyRef: {name: RELEASE-NAME-puppetboard, key: SECRET_KEY}}
+  - it: a digest wins over the tag
+    set:
+      image.digest: sha256:0f9552bb28711333da16915ec146f5e6bb44a7fdac9ced15dc17c2e0206346dd
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/dennispohlmann/puppetboard@sha256:0f9552bb28711333da16915ec146f5e6bb44a7fdac9ced15dc17c2e0206346dd
+  - it: plain HTTP to PuppetDB mounts no certificate
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: PUPPETDB_SSL_VERIFY, value: "false"}
+      - notContains:
+          path: spec.template.spec.volumes
+          content: {name: puppetdb-tls}
+          any: true
+  - it: TLS mounts the client certificate and checks PuppetDB with the CA
+    set:
+      puppetdb.port: 8081
+      puppetdb.sslVerify: true
+      puppetdb.tls.enabled: true
+      puppetdb.tls.existingSecret: pdb-tls
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: PUPPETDB_SSL_VERIFY, value: /etc/puppetboard/ssl/ca.crt}
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: PUPPETDB_KEY, value: /etc/puppetboard/ssl/tls.key}
+      - contains:
+          path: spec.template.spec.volumes
+          content: {name: puppetdb-tls, secret: {secretName: pdb-tls, defaultMode: 256}}
+  - it: API and MCP are off by default
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: ENABLE_API, value: "false"}
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: ENABLE_MCP, value: "false"}
+  - it: MCP takes its allowed hosts from the ingress and the HTTPRoute
+    set:
+      mcp.enabled: true
+      ingress.enabled: true
+      ingress.hosts: [{host: pb.example.com, paths: [{path: /, pathType: Prefix}]}]
+      httpRoute.enabled: true
+      httpRoute.parentRefs: [{name: gw}]
+      httpRoute.hostnames: [pb.internal.example.com]
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: MCP_ALLOWED_HOSTS, value: "pb.example.com,pb.internal.example.com"}
+  - it: explicit MCP hosts win
+    set:
+      mcp.enabled: true
+      mcp.allowedHosts: [mcp.example.com]
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: MCP_ALLOWED_HOSTS, value: mcp.example.com}
+  - it: config entries become environment variables
+    set:
+      config.PAGE_TITLE: Infra
+      config.REFRESH_RATE: 60
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: PAGE_TITLE, value: Infra}
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: {name: REFRESH_RATE, value: "60"}

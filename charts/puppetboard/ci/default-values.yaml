@@ -1,0 +1,8 @@
+# Smallest working installation: plain HTTP to PuppetDB inside the cluster.
+secretKey: ci-test-secret-key-0123456789abcdef
+puppetdb:
+  host: puppetdb.puppet.svc
+  port: 8080
+  sslVerify: false
+  tls:
+    enabled: false

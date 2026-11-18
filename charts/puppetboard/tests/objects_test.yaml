@@ -1,0 +1,41 @@
+suite: optional objects
+templates:
+  - templates/ingress.yaml
+  - templates/httproute.yaml
+  - templates/networkpolicy.yaml
+  - templates/pdb.yaml
+  - templates/service.yaml
+values:
+  - ../ci/full-values.yaml
+tests:
+  - it: ingress keeps the Basic-Auth annotations and points to the service
+    template: templates/ingress.yaml
+    asserts:
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/auth-type"]
+          value: basic
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.port.name
+          value: http
+  - it: network policy allows egress only to DNS and PuppetDB
+    template: templates/networkpolicy.yaml
+    asserts:
+      - lengthEqual:
+          path: spec.egress
+          count: 2
+      - equal:
+          path: spec.egress[1].ports[0].port
+          value: 8081
+  - it: off by default
+    template: templates/pdb.yaml
+    set:
+      podDisruptionBudget.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: service targets the http port
+    template: templates/service.yaml
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: http

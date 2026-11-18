@@ -1,0 +1,16 @@
+{{- if .Values.httpRoute.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+{{ include "puppetboard.metadata" (dict "context" . "name" (include "puppetboard.fullname" .) "annotations" .Values.httpRoute.annotations) }}
+spec:
+  parentRefs:
+    {{- toYaml .Values.httpRoute.parentRefs | nindent 4 }}
+  {{- with .Values.httpRoute.hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - backendRefs:
+        - name: {{ include "puppetboard.fullname" . }}
+          port: {{ .Values.service.port }}
+{{- end }}

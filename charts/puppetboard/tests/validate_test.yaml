@@ -1,0 +1,24 @@
+suite: validation
+templates:
+  - templates/deployment.yaml
+tests:
+  - it: refuses to install without a secret key
+    set:
+      puppetdb.tls.enabled: false
+    asserts:
+      - failedTemplate:
+          errorMessage: "puppetboard: set secretKey (openssl rand -hex 32) or existingSecret"
+  - it: refuses TLS without certificates
+    set:
+      secretKey: x
+    asserts:
+      - failedTemplate:
+          errorMessage: "puppetboard: puppetdb.tls needs existingSecret or ca, cert and key"
+  - it: refuses MCP without a host name
+    set:
+      secretKey: x
+      puppetdb.tls.enabled: false
+      mcp.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "puppetboard: mcp.enabled needs mcp.allowedHosts or an ingress/httpRoute host"

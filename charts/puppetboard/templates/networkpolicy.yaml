@@ -1,0 +1,33 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+{{ include "puppetboard.metadata" (dict "context" . "name" (include "puppetboard.fullname" .)) }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "puppetboard.selectorLabels" . | nindent 6 }}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - ports:
+        - port: http
+          protocol: TCP
+      {{- with .Values.networkPolicy.ingressFrom }}
+      from:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  egress:
+    # DNS
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # PuppetDB
+    - ports:
+        - port: {{ .Values.puppetdb.port }}
+          protocol: TCP
+      {{- with .Values.networkPolicy.puppetdbTo }}
+      to:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

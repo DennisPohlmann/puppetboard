@@ -60,6 +60,7 @@ Optionally you can set `PUPPETBOARD_URL_PREFIX` env variable to a value like `/p
 
 Ready-made [docker-compose examples](docker-compose/) cover Puppetboard alone and behind nginx with TLS and
 Basic-Auth.
+For Kubernetes there is a [Helm chart](charts/puppetboard/).
 
 The image can also serve a read-only JSON API (`-e ENABLE_API=true`) and an MCP server for AI assistants
 (`-e ENABLE_MCP=true -e MCP_ALLOWED_HOSTS=puppetboard.example.com`). Both have no authentication of their own,
