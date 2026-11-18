@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 - API and MCP follow the CIS API Security Guide and the CIS MCP Server Benchmark: input validation, limits,
   rate limit, audit log; authentication belongs in the reverse proxy.
 - Published as `puppetboard-dp` on PyPI (Trusted Publishing) and as `ghcr.io/dennispohlmann/puppetboard`.
+- Helm chart in `charts/puppetboard` and docker-compose examples in `docker-compose/` (Puppetboard only,
+  for an existing PuppetDB).
 
 **Changed**
 
