@@ -179,7 +179,9 @@ def stream_template(template_name, **context):
     app.update_template_context(context)
     t = app.jinja_env.get_template(template_name)
     rv = t.stream(context)
-    rv.enable_buffering(5)
+    # about 100 template events per chunk (~10 KB) instead of 5 (~120 bytes):
+    # thousands of tiny writes were the main cost of big streamed pages
+    rv.enable_buffering(100)
     return rv
 
 
