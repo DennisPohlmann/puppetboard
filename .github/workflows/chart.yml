@@ -1,0 +1,40 @@
+name: chart
+
+# Checks the Helm chart in charts/puppetboard on every push and pull request:
+# helm lint (default and ci values, values.schema.json), unit tests
+# (helm-unittest) and kubeconform against the Kubernetes API.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CHART: charts/puppetboard
+  HELM_VERSION: v4.3.2
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: azure/setup-helm@v5
+        with:
+          version: ${{ env.HELM_VERSION }}
+      - name: helm lint (default and ci values)
+        run: |
+          for f in "$CHART"/ci/*-values.yaml; do helm lint --strict "$CHART" -f "$f"; done
+      - name: unit tests (helm-unittest)
+        run: docker run --rm -v "$PWD/$CHART:/apps" helmunittest/helm-unittest:latest --strict .
+      - name: kubeconform (rendered manifests against the Kubernetes API)
+        run: |
+          for f in "$CHART"/ci/*-values.yaml; do
+            helm template puppetboard "$CHART" -f "$f" --kube-version 1.33.0 |
+              docker run --rm -i ghcr.io/yannh/kubeconform:latest -strict -summary \
+                -kubernetes-version 1.33.0 -schema-location default \
+                -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+          done
+      - name: package (check only, not pushed)
+        run: helm package "$CHART" --destination dist
