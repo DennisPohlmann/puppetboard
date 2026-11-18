@@ -15,7 +15,8 @@ A release needs Dennis' explicit "RELEASE GO" and a passed security gate.
    ```
 
 The tag starts three workflows. Each first checks that the tagged commit is
-on `main` and stops otherwise:
+on `main` and that the tag matches the version in `pyproject.toml`, and stops
+otherwise:
 
 - `publish-to-pypi.yml` checks that the tag matches the version in
   `pyproject.toml`, runs the unit tests, builds the package and uploads it to PyPI with
