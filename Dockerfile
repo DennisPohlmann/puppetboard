@@ -16,11 +16,19 @@ EXPOSE 80
 
 HEALTHCHECK --interval=1m --timeout=5s --start-period=10s CMD python3 -c "import requests; import sys; rc = 0 if requests.get('http://localhost:${PUPPETBOARD_PORT}${PUPPETBOARD_URL_PREFIX:-}${PUPPETBOARD_STATUS_ENDPOINT}').ok else 255; sys.exit(rc)"
 
-RUN apk add --no-cache gcc libmemcached-dev libc-dev zlib-dev
+RUN apk upgrade --no-cache
 RUN mkdir -p /usr/src/app/
 WORKDIR /usr/src/app/
 COPY . /usr/src/app
-RUN pip install --no-cache-dir -r requirements-docker.txt .
+# The compiled dependencies come as musl wheels and the rest is pure Python,
+# so no compiler is needed: keeping gcc, binutils and the -dev packages out of
+# the image removes their CVEs. Without gcc a dependency that needs compiling
+# fails the build instead of slipping in.
+RUN pip install --no-cache-dir --prefer-binary --root-user-action=ignore -r requirements-docker.txt . \
+    && pip uninstall -y --root-user-action=ignore pip \
+    && rm -rf /usr/local/lib/python3*/ensurepip
+# pip is not needed at runtime and ships its own, older urllib3, msgpack and
+# setuptools copies that scanners report, so it leaves the image.
 
 COPY Dockerfile /
 
