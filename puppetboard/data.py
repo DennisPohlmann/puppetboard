@@ -36,7 +36,7 @@ class Disabled(PermissionError):
 
 
 def check(pattern, value, what):
-    if not isinstance(value, str) or not pattern.match(value):
+    if not isinstance(value, str) or not pattern.fullmatch(value):
         raise InvalidArgument(f'invalid {what}')
     return value
 

@@ -100,3 +100,10 @@ def test_puppetdb_404_becomes_not_found(pdb_query):
     pdb_query.side_effect = http_error(404)
     with pytest.raises(data.NotFound):
         data.node('node1')
+
+
+def test_check_refuses_trailing_newline():
+    # '$' alone would also match before a final newline
+    with pytest.raises(data.InvalidArgument):
+        data.check(data.CERTNAME, 'web01\n', 'certname')
+    assert data.check(data.CERTNAME, 'web01', 'certname') == 'web01'
