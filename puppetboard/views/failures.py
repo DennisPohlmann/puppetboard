@@ -1,9 +1,11 @@
+import json
+
 from flask import Response, stream_with_context, abort
 from pypuppetdb.QueryBuilder import AndOperator, EqualsOperator
 
 from puppetboard.core import get_app, get_puppetdb, environments, stream_template, to_html, \
     get_friendly_error, get_raw_error
-from puppetboard.utils import check_env, yield_or_stop
+from puppetboard.utils import check_env, get_or_abort, yield_or_stop
 
 app = get_app()
 puppetdb = get_puppetdb()
@@ -32,22 +34,14 @@ def failures(env: str, show_error_as: str):
         with_event_numbers=False,
     )
 
+    nodes = list(yield_or_stop(nodes))
+    logs = latest_report_logs([node.latest_report_hash for node in nodes])
     failures = []
 
-    for node in yield_or_stop(nodes):
-
-        report_query = AndOperator()
-        report_query.add(EqualsOperator('hash', node.latest_report_hash))
-
-        reports = puppetdb.reports(
-            query=report_query,
-        )
-
-        latest_failed_report = next(reports)
-
+    for node in nodes:
         source = None
         message = None
-        for log in latest_failed_report.logs:
+        for log in logs.get(node.latest_report_hash, []):
             if log['level'] not in ['info', 'notice', 'warning']:
                 if log['source'] != 'Facter':
                     source = log['source']
@@ -76,3 +70,17 @@ def failures(env: str, show_error_as: str):
                         envs=envs,
                         current_env=env,
                         current_show_error_as=show_error_as)))
+
+
+def latest_report_logs(hashes, chunk=100):
+    """Logs of the given reports as {hash: logs}, a few queries instead of one per node."""
+    logs = {}
+    for i in range(0, len(hashes), chunk):
+        query = ['extract', ['hash', 'logs'],
+                 ['in', 'hash', ['array', hashes[i:i + chunk]]]]
+        # POST: a GET URL with 100 hashes would exceed the request line limit
+        rows = get_or_abort(puppetdb._query, 'reports', query=json.dumps(query),
+                            request_method='POST')
+        for row in rows:
+            logs[row['hash']] = (row.get('logs') or {}).get('data', [])
+    return logs
