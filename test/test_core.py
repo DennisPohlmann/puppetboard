@@ -39,3 +39,15 @@ def test_get_friendly_error(raw_message, friendly_message):
     raw_message = dedent(raw_message)
     friendly_message = dedent(friendly_message).strip()
     assert get_friendly_error("Puppet", raw_message, "foo.bar.com") == friendly_message
+
+
+def test_environment_names_cached(mocker):
+    from puppetboard import core
+    envs = mocker.patch.object(core.get_puppetdb(), 'environments',
+                               return_value=[{'name': 'b'}, {'name': 'a'}])
+    assert core.environment_names() == ['a', 'b']
+    assert core.environment_names() == ['a', 'b']
+    assert envs.call_count == 1
+    mocker.patch.object(core.time, 'monotonic', return_value=core.time.monotonic() + 61)
+    core.environment_names()
+    assert envs.call_count == 2

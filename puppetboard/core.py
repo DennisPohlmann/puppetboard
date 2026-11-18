@@ -1,6 +1,7 @@
 import logging
 import re
 import socket
+import time
 from importlib.metadata import version
 
 from flask import Flask
@@ -123,13 +124,24 @@ def get_scheduler():
     return SCHEDULER
 
 
+# Every page lists the environments; they change rarely, so ask PuppetDB at
+# most once a minute per process instead of on every request.
+ENVIRONMENTS_TTL = 60
+_environments_cache: dict = {}
+
+
+def environment_names() -> list:
+    cached = _environments_cache.get('names')
+    if cached and time.monotonic() - cached[0] < ENVIRONMENTS_TTL:
+        return cached[1]
+    names = sorted(env['name'] for env in get_or_abort(get_puppetdb().environments))
+    _environments_cache['names'] = (time.monotonic(), names)
+    return names
+
+
 def environments() -> dict:
     envs = {}
-    puppetdb = get_puppetdb()
-    envs_from_db = sorted(
-        env['name']
-        for env in get_or_abort(puppetdb.environments)
-    )
+    envs_from_db = environment_names()
 
     # Adding all environments
     envs['All Environments'] = {

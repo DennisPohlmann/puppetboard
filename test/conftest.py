@@ -4,7 +4,12 @@ import pytest
 from mockey.fixture import MockAutospecFixture
 from pypuppetdb.types import Node
 
-from puppetboard import app
+from puppetboard import app, core
+
+
+@pytest.fixture(autouse=True)
+def clear_environments_cache():
+    core._environments_cache.clear()
 
 
 @pytest.fixture(autouse=True, scope="function")
