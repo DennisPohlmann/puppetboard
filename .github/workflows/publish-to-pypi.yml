@@ -9,6 +9,10 @@ jobs:
   build-n-publish:
 
     runs-on: ubuntu-latest
+    # must match the environment of the trusted publisher on PyPI
+    environment:
+      name: pypi
+      url: https://pypi.org/project/puppetboard-dp/
     permissions:
       contents: write   # create the GitHub release
       id-token: write   # PyPI Trusted Publishing (OIDC), no API token
