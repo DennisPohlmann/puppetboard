@@ -60,7 +60,8 @@ docker run -it \
 ```
 Note: you must provide a secret key! Generate one for example by running `ruby -e "require 'securerandom'; puts SecureRandom.hex(32)"`.
 
-The container runs as an unprivileged user. Where it may not bind port 80 (e.g. rootless Podman), set
+The image is based on Chainguard's minimal Python image: it has no shell and no package manager
+(`docker exec ... sh` does not work) and runs as an unprivileged user. Where it may not bind port 80 (e.g. rootless Podman), set
 `PUPPETBOARD_PORT=8080` and publish that port.
 
 Optionally you can set `PUPPETBOARD_URL_PREFIX` env variable to a value like `/puppetboard` to run the app under a URL prefix.
