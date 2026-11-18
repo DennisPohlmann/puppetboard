@@ -28,7 +28,7 @@ jobs:
           for f in "$CHART"/ci/*-values.yaml; do helm lint --strict "$CHART" -f "$f"; done
       - name: unit tests (helm-unittest)
         # as the runner user, so the tests may create their snapshot folder
-        run: docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/$CHART:/apps" helmunittest/helm-unittest:latest --strict .
+        run: docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD/$CHART:/apps" helmunittest/helm-unittest:latest --strict .
       - name: kubeconform (rendered manifests against the Kubernetes API)
         run: |
           for f in "$CHART"/ci/*-values.yaml; do

@@ -99,7 +99,7 @@ certificate, or with MCP but no host name.
 
 ```bash
 helm lint --strict charts/puppetboard -f charts/puppetboard/ci/full-values.yaml
-docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/charts/puppetboard:/apps" helmunittest/helm-unittest --strict .
+docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD/charts/puppetboard:/apps" helmunittest/helm-unittest --strict .
 ```
 
 The CI workflow `chart.yml` runs lint, the unit tests and kubeconform on every
