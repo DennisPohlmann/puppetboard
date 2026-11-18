@@ -51,3 +51,10 @@ def test_environment_names_cached(mocker):
     mocker.patch.object(core.time, 'monotonic', return_value=core.time.monotonic() + 61)
     core.environment_names()
     assert envs.call_count == 2
+
+
+def test_get_friendly_error_certname_is_literal():
+    # a dot in the certname must not match any character, and no regex syntax may break it
+    message = "Error: failed on node fooXbar.com"
+    assert get_friendly_error("Puppet", message, "foo.bar.com") == message
+    assert get_friendly_error("Puppet", "Error: x on node a(b", "a(b") == "Error: x"
