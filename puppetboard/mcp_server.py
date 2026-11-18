@@ -35,7 +35,7 @@ information in facts, find the fact that holds it:
    values per node; get_node_facts gives facts of one node.
 Example: installed packages are only in facts if a module provides such a
 fact; search for 'package' to find it. Packages that Puppet manages are also
-catalog resources of type 'package' (list_node_resources).
+catalog resources of type 'package' (list_node_resources, if enabled).
 Node status: failed, changed, unchanged, noop or unreported. Use small limits
 and page with offset instead of fetching everything at once."""
 
@@ -137,14 +137,15 @@ def create_server(config):
         """One report with logs, metrics and changed resources (resource events)."""
         return data.report(report_hash)
 
-    @tool
-    def list_node_resources(
-            certname: Certname,
-            type: Annotated[str | None, Field(description='Resource type, e.g. package, file, service, class')] = None,  # noqa: E501 pylint: disable=line-too-long,redefined-builtin
-            title: Annotated[str | None, Field(max_length=1024)] = None,
-            limit: Limit = 100, offset: Offset = 0) -> list[dict]:
-        """Resources in the latest catalog of a node."""
-        return data.node_resources(certname, type, title, limit, offset)
+    if config['ENABLE_CATALOG']:
+        @tool
+        def list_node_resources(
+                certname: Certname,
+                type: Annotated[str | None, Field(description='Resource type, e.g. package, file, service, class')] = None,  # noqa: E501 pylint: disable=line-too-long,redefined-builtin
+                title: Annotated[str | None, Field(max_length=1024)] = None,
+                limit: Limit = 100, offset: Offset = 0) -> list[dict]:
+            """Resources in the latest catalog of a node."""
+            return data.node_resources(certname, type, title, limit, offset)
 
     if config['ENABLE_QUERY']:
         @tool

@@ -22,6 +22,7 @@ see [Securing API and MCP](#securing-api-and-mcp).
 | `API_MAX_QUERY_LENGTH` | `API_MAX_QUERY_LENGTH` | `4096` | Longest accepted PQL query. |
 | `API_RATE_LIMIT` | `API_RATE_LIMIT` | `120` | Requests per minute and client IP (API and MCP), `0` turns it off. Counted per worker process. |
 | `ENABLE_QUERY` | `ENABLE_QUERY` | `True` | Also gates `/api/v1/query` (and `ENABLED_QUERY_ENDPOINTS` must contain `pql`). |
+| `ENABLE_CATALOG` | `ENABLE_CATALOG` | `False` | Also gates `/api/v1/nodes/<certname>/resources`; resource parameters can hold secrets. |
 
 ### Endpoints
 
@@ -36,7 +37,7 @@ The machine-readable description is served at `/api/v1/openapi.json`
 | `/api/v1/facts/<name>?environment=` | One top-level fact on every node. |
 | `/api/v1/nodes/<certname>/reports` | Report summaries of the node, newest first. |
 | `/api/v1/reports/<hash>` | One report with logs, metrics and resource events. |
-| `/api/v1/nodes/<certname>/resources?type=&title=` | Catalog resources of the node, e.g. `type=package`. |
+| `/api/v1/nodes/<certname>/resources?type=&title=` | Catalog resources of the node, e.g. `type=package`, only with `ENABLE_CATALOG`. |
 | `/api/v1/query?pql=` | Result of a PQL query, only with `ENABLE_QUERY`. |
 
 List endpoints take `limit` and `offset` and answer
@@ -55,7 +56,7 @@ List endpoints take `limit` and `offset` and answer
 | Status | When |
 |---|---|
 | 400 | Invalid parameter (certname, fact name, hash, status, limit, PQL syntax). |
-| 403 | PQL query while `ENABLE_QUERY` is off. |
+| 403 | PQL query while `ENABLE_QUERY` is off, resources while `ENABLE_CATALOG` is off. |
 | 404 | Unknown node or report, or the API is disabled. |
 | 405 | Any method other than `GET`. |
 | 429 | Rate limit hit, see the `Retry-After` header. |
@@ -98,6 +99,7 @@ Outside the container install the package with the `mcp` extra:
 | `MCP_PROTOCOL_VERSIONS` | `MCP_PROTOCOL_VERSIONS` (comma separated) | `2025-06-18,2025-11-25,2026-07-28` | Accepted `MCP-Protocol-Version` headers. |
 | `API_RATE_LIMIT` | `API_RATE_LIMIT` | `120` | Same setting as for the API, requests per minute and client, counted separately for `/mcp`. |
 | `ENABLE_QUERY` | `ENABLE_QUERY` | `True` | Offers the `run_pql` tool. |
+| `ENABLE_CATALOG` | `ENABLE_CATALOG` | `False` | Offers the `list_node_resources` tool. |
 
 ### Tools
 
@@ -115,7 +117,7 @@ All tools are read-only and marked so (`readOnlyHint`).
 | `find_fact_values` | Values at a dotted fact path (`*` as wildcard element), optional value regex. |
 | `list_node_reports` | Report summaries of a node, newest first. |
 | `get_report` | One report with logs, metrics and events. |
-| `list_node_resources` | Catalog resources of a node, e.g. type `package`. |
+| `list_node_resources` | Catalog resources of a node, e.g. type `package`, only with `ENABLE_CATALOG`. |
 | `run_pql` | Any PQL query, only with `ENABLE_QUERY`. |
 
 Puppetboard does not add a fact of its own. Facts differ from site to site,

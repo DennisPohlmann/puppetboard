@@ -10,10 +10,10 @@ from puppetboard.views import api
 
 @pytest.fixture
 def api_client(client):
-    app.app.config['ENABLE_API'] = True
+    app.app.config.update(ENABLE_API=True, ENABLE_CATALOG=True)
     api.limiter.per_minute = 0
     yield client
-    app.app.config['ENABLE_API'] = False
+    app.app.config.update(ENABLE_API=False, ENABLE_CATALOG=False)
 
 
 @pytest.fixture
@@ -125,6 +125,12 @@ def test_query_disabled(api_client, mocker):
     finally:
         app.app.config['ENABLE_QUERY'] = True
     pql.assert_not_called()
+
+
+def test_resources_need_enable_catalog(api_client, pdb_query):
+    app.app.config['ENABLE_CATALOG'] = False
+    assert api_client.get('/api/v1/nodes/node1/resources').status_code == 403
+    pdb_query.assert_not_called()
 
 
 def test_query_truncates(api_client, mocker):

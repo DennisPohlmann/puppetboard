@@ -9,7 +9,8 @@ from puppetboard import app
 from puppetboard.mcp_server import McpEndpoint, create_server
 
 CONFIG = dict(app.app.config, MCP_ALLOWED_HOSTS=['puppetboard.test'], MCP_ALLOWED_ORIGINS=[],
-              MCP_MAX_REQUEST_BODY=1024, API_RATE_LIMIT=0, ENABLE_QUERY=True)
+              MCP_MAX_REQUEST_BODY=1024, API_RATE_LIMIT=0, ENABLE_QUERY=True,
+              ENABLE_CATALOG=True)
 
 
 @pytest.fixture
@@ -41,6 +42,10 @@ def test_all_tools_read_only():
 
 def test_pql_tool_only_with_enable_query():
     assert 'run_pql' not in {t.name for t in tools(dict(CONFIG, ENABLE_QUERY=False))}
+
+
+def test_resources_tool_only_with_enable_catalog():
+    assert 'list_node_resources' not in {t.name for t in tools(dict(CONFIG, ENABLE_CATALOG=False))}
 
 
 def test_list_nodes_trims_fields(pdb_query):

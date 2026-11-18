@@ -207,6 +207,9 @@ def resource_type(value):
 
 
 def node_resources(certname, type_=None, title=None, limit=None, offset=None):
+    # resource parameters can hold secrets, the UI hides catalogs the same way
+    if not get_app().config['ENABLE_CATALOG']:
+        raise Disabled('catalog resources are disabled (ENABLE_CATALOG)')
     limit, offset = page(limit, offset)
     clauses = [['=', 'certname', check(CERTNAME, certname, 'certname')]]
     if type_:

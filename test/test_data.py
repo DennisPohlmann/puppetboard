@@ -71,9 +71,17 @@ def test_report_not_found(pdb_query):
         data.report('a' * 40)
 
 
-def test_node_resources_title_too_long(pdb_query):
+def test_node_resources_title_too_long(pdb_query, mocker):
+    mocker.patch.dict(app.app.config, ENABLE_CATALOG=True)
     with pytest.raises(data.InvalidArgument):
         data.node_resources('node1', title='x' * 2000)
+
+
+def test_node_resources_need_enable_catalog(pdb_query, mocker):
+    mocker.patch.dict(app.app.config, ENABLE_CATALOG=False)
+    with pytest.raises(data.Disabled):
+        data.node_resources('node1')
+    pdb_query.assert_not_called()
 
 
 def test_pql_syntax_error_is_invalid_argument(mocker):
