@@ -2,8 +2,9 @@
 
 [![PyPI Version](https://img.shields.io/pypi/v/puppetboard-dp)](https://pypi.org/project/puppetboard-dp/)
 ![Tests Status](https://github.com/DennisPohlmann/puppetboard/actions/workflows/tests.yml/badge.svg)
-[![By Voxpupuli](https://img.shields.io/badge/by-Vox%20Pupuli%20%F0%9F%A6%8A-ef902f.svg)](http://voxpupuli.org)
 
+This is a fork of [voxpupuli/puppetboard](https://github.com/voxpupuli/puppetboard) by [Vox Pupuli](https://voxpupuli.org)
+with a read-only JSON API, an MCP server for AI assistants, current dependencies and a hardened container image.
 
 Puppetboard is a web interface to [PuppetDB](https://puppet.com/docs/puppetdb/latest/index.html) aiming to replace
 the reporting functionality of [Puppet Enterprise console (previously: Puppet Dashboard)](https://puppet.com/docs/pe/latest/console_accessing.html)
@@ -30,13 +31,7 @@ See [more screenshots here](#more-screenshots).
 
 ## Installation<a id="installation"></a>
 
-Puppetboard is packaged and available on PyPI.
-
-### With Puppet module
-
-There is a [Puppet module](https://forge.puppetlabs.com/puppet/puppetboard) originally written by
- [Spencer Krum](https://github.com/nibalizer) and currently maintained by [Voxpupuli](https://voxpupuli.org/)
-that takes care of installing the Puppetboard for you.
+This fork is available on PyPI as `puppetboard-dp` and as container image `ghcr.io/dennispohlmann/puppetboard`.
 
 ### Using Docker
 
@@ -58,8 +53,8 @@ docker run -it \
 With `--net=host` next to PuppetDB, `PUPPETBOARD_PORT` must differ from PuppetDB's port 8080.
 Note: you must provide a secret key! Generate one for example by running `ruby -e "require 'securerandom'; puts SecureRandom.hex(32)"`.
 
-The image is based on the official `python:3.15-alpine` image, pinned by digest, without compiler and pip. It runs as the unprivileged user `puppetboard` (uid 10001). It listens on
-port **8080** (`PUPPETBOARD_PORT`); images before this change used port 80, so adjust your port mapping or proxy.
+The image is based on the official `python:3.15-alpine` image, pinned by digest, without compiler and pip. It runs as the unprivileged user `puppetboard` (uid 10001) and listens on
+port **8080** (`PUPPETBOARD_PORT`).
 
 Optionally you can set `PUPPETBOARD_URL_PREFIX` env variable to a value like `/puppetboard` to run the app under a URL prefix.
 
@@ -133,76 +128,21 @@ We also provide the Dockerfile, so you can build the image yourself:
 docker build -t puppetboard .
 ```
 
-### Using Red Hat OpenShift
-
-The included OpenShift template file helps in the creation of the Puppetboard web interface by adopting a source-to-image methodology.
-
-You can run the app on your OpenShift environment with these commands:
-
-```bash
-# Import the template into OpenShift
-oc create -f puppetboard-s2i-template.yaml 
-
-# Create the Puppetboard application and supporting Pods.
-oc new-app -p PUPPETDB_HOST=puppetdb.fqdn.com \
-           --template=puppetboard-template
-```
-
-This will build a puppetboard application that queries a PuppetDB database at puppetdb.fqdn.com.
-
-Optionally you can set other environment variables to fit your needs:
-
-```bash
-oc new-app -p PUPPETDB_HOST=puppetdb.fqdn.com \
-           -p PUPPETDB_PORT=3456 \
-           -p PUPPETBOARD_SOURCE_REPOSITORY_REF="v5.4.0" \
-           -p PUPPETBOARD_SERVICE_NAME=prod_puppetboard \
-           --template=puppetboard-template
-```
-
-This will build Puppetboard version v5.4.0 that queries the PuppetDB server on TCP/3456.
-
-The following is a list of OpenShift parameters that you can pass to the ``oc`` command to customize the application:
-
-- `PUPPETBOARD_SERVICE_NAME`: This is the name that will be used for application.  Deployment Configs, Build Configs 
-    Services, Routes and Pods will use this value for their names as well.  You can instantiate multiple applications
-    by using different names in ``oc new-app``.  Defaults to 'puppetboard'.
-- `PUPPETDB_HOST`: This is the name of the PuppetDB host that Puppetboard will query for its reports.  Defaults to 'puppetdb'.
-- `PUPPETDB_PORT`: This is tcp port on the `PUPPETDB_HOST` for queries.  Defaults to '8080'.
-- `PUPPETBOARD_SECRET_KEY`: Identical to `SECRET_KEY` (below).  Defaults to 'Secr3t_K3y'.
-- `PUPPETBOARD_PORT`: The TCP port on which the Puppetboard docker image presents the web interface (container default 8080).  This is not the
-    user-facing web interface.  Rather, it's the port that the OpenShift route forwards **to**.  
-- `SERVICE_PORT`: The TCP port on which the Puppetboard service offers its user-facing web interface on OpenShift.  Defaults to '80'.
-- `PUPPETBOARD_SOURCE_REPOSITORY_URL`: The URL to the Puppetboard repository.  Defaults to 'https://github.com/DennisPohlmann/puppetboard.git'.
-- `PUPPETBOARD_SOURCE_REPOSITORY_REF`: The branch/tag/ref for Puppetboard.  Defaults to 'master'.
-
-### From a package
-
-Actively maintained packages:
-
-* [FreeBSD](https://www.freshports.org/www/py-puppetboard/)
-  maintained by [Romain Tartière](https://github.com/smortex)
-* [OpenBSD](https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/www/puppetboard/)
-  maintained by [Sebastian Reitenbach](https://github.com/buzzdeee)
-
 ### Manually
 
-You can also install the package from PyPI and configure a WSGI-capable application server to serve it
-(`puppetboard.app:app`). For the MCP server use the ASGI entry point `puppetboard.asgi:app` instead, see
-[Deployment setups](docs/Deployment-setups.md#nginx--gunicorn-asgi-worker-json-api-and-mcp-server).
-
-We recommend using virtualenv to provide a separate environment for the app.
+Install the package from PyPI into a virtual environment. The extra `mcp` adds gunicorn and what the MCP
+server needs; the package to import and run is still `puppetboard`.
 
 ```bash
-virtualenv -p python3 venv
-. venv/bin/activate
-pip install puppetboard-dp
+python3 -m venv /opt/puppetboard
+/opt/puppetboard/bin/pip install 'puppetboard-dp[mcp]'
+PUPPETBOARD_SETTINGS=/etc/puppetboard/settings.py \
+  /opt/puppetboard/bin/gunicorn -k asgi -b 127.0.0.1:8080 puppetboard.asgi:app
 ```
 
-This fork is published on PyPI as `puppetboard-dp` (the package to import and run is still `puppetboard`);
-the upstream project is `puppetboard`.
-
-Please see [an article about more deployment setups here](https://github.com/voxpupuli/puppetboard/blob/master/docs/Deployment-setups.md).
+`puppetboard.asgi:app` serves the web interface, the JSON API and the MCP server. The plain WSGI app
+`puppetboard.app:app` (without MCP) works with any WSGI server. See [Deployment setups](docs/Deployment-setups.md)
+for a systemd unit and a reverse proxy with authentication.
 
 ## Configuration<a id="configuration"></a>
 
@@ -230,7 +170,7 @@ Please read more about this feature in the [PuppetDB documentation here](https:/
 
 Puppetboard will look for a file pointed at by the `PUPPETBOARD_SETTINGS` environment variable.
 The file has to be identical to
-[default_settings.py](https://github.com/voxpupuli/puppetboard/blob/master/puppetboard/default_settings.py)
+[default_settings.py](puppetboard/default_settings.py)
 but should only override the settings you need changed.
 
 If you run PuppetDB and Puppetboard on the same machine the default settings provided will be enough to get you started
@@ -269,7 +209,7 @@ to explicitly specify the protocol to be used setting the `PUPPETDB_PROTO` varia
 Other settings that might be interesting, in no particular order:
 
 - `SECRET_KEY`: set this to a long string, **the same for each application replica**, and keep it secret. Refer to
-    [Flask documentation](https://flask.palletsprojects.com/en/2.1.x/quickstart/#sessions), section
+    [Flask documentation](https://flask.palletsprojects.com/en/stable/quickstart/#sessions), section
     "How to generate good secret keys" for more info. Cannot be an empty string, which is the default.
 - `FAVORITE_ENVS`: an ordered list of Puppet environment names that will be shown immediately after "All Environments"
     and before other environments (which are sorted by name) in the dropdown for choosing the environment shown
@@ -280,7 +220,7 @@ Other settings that might be interesting, in no particular order:
 - `CODE_PREFIX_TO_REMOVE`: what code path that should be shortened in "Friendly errors" to "…" for readability.
     A regexp. Defaults to `/etc/puppetlabs/code/environments(/.*?/modules)?`.
 - `PUPPETDB_TIMEOUT`: Defaults to 20 seconds, but you might need to increase this value. It depends on how big the
-    results are when querying PuppetDB. This behaviour will change in a future release when pagination will be introduced.
+    results are when querying PuppetDB.
 - `UNRESPONSIVE_HOURS`: The amount of hours since the last check-in after which a node is considered unresponsive.
 - `LOGLEVEL`: A string representing the loglevel. It defaults to `'info'` but can be changed to `'warning'` or
     `'critical'` for less verbose logging or `'debug'` for more information.
@@ -289,10 +229,11 @@ Other settings that might be interesting, in no particular order:
     See `ENABLED_QUERY_ENDPOINTS` to fine-tune which endpoints are allowed.
 - `ENABLED_QUERY_ENDPOINTS`: If `ENABLE_QUERY` is `True`, allow to fine tune the endpoints of PuppetDB APIs that
     can be queried. It must be a list of strings of PuppetDB endpoints for which the query is enabled.
-    See the `QUERY_ENDPOINTS` constant in the `puppetboard.app` module for a list of the available endpoints.
-- `GRAPH_TYPE`: Specify the type of graph to display.   Default is
-    pie, other good option is donut.   Other choices can be found here:
-    [C3.js documentation](https://c3js.org/examples.html#chart)
+    See the `QUERY_ENDPOINTS` constant in the `puppetboard.forms` module for a list of the available endpoints.
+- `QUERY_PRESETS_FILE`: Path to a YAML file with saved queries offered on the Query page, see
+    [QUERY_PRESETS.md](QUERY_PRESETS.md). Defaults to `None` (no presets).
+- `GRAPH_TYPE`: Specify the type of graph to display on fact pages. Default is `pie`, another good option is
+    `donut`; the chart library is [billboard.js](https://naver.github.io/billboard.js/demo/).
 - `GRAPH_FACTS`: A list of fact names to tell PuppetBoard to generate a pie-chart on the fact page. With some fact
     values being unique per node, like ipaddress, uuid, and serial number, as well as structured facts it was no longer
     feasible to generate a graph for everything.
@@ -304,8 +245,10 @@ Other settings that might be interesting, in no particular order:
 - `REFRESH_RATE`: Defaults to `30` the number of seconds to wait until the index page is automatically refreshed.
 - `DEFAULT_ENVIRONMENT`: Defaults to `'production'`, as the name suggests, load all information filtered by this
     environment value, for All Environments use `'*'`.
-- `REPORTS_COUNT`: Defaults to `10` the limit of the number of reports to load on the node or any reports page.
-- `OFFLINE_MODE`: If set to `True` load static assets (jquery, semantic-ui, etc) from the local web server instead
+- `PAGE_TITLE`: Title of the browser window. Defaults to `Puppetboard`.
+- `OVERVIEW_FILTER`: An extra PuppetDB query (pypuppetdb QueryBuilder) applied to the nodes on the Overview page.
+    Defaults to `None`.
+- `OFFLINE_MODE`: If set to `True` load static assets (jQuery, Fomantic-UI, DataTables, ...) from the local web server instead
     of a CDN. Defaults to `False`.
 - `DAILY_REPORTS_CHART_ENABLED`: Enable the use of daily chart graphs when looking at dashboard and node view.
 - `DAILY_REPORTS_CHART_DAYS`: Number of days to show history for on the daily report graphs.
@@ -313,7 +256,8 @@ Other settings that might be interesting, in no particular order:
 - `DISPLAYED_METRICS`: Metrics to show when displaying node summary. Example: `'resources.total'`, `'events.noop'`.
 - `TABLE_COUNT_SELECTOR`: Configure the dropdown to limit number of hosts to show per page.
 - `LITTLE_TABLE_COUNT`: Default number of reports to show when when looking at a node.
-- `NORMAL_TABLE_COUNT`: Default number of nodes to show when displaying reports and catalog nodes.
+- `NORMAL_TABLE_COUNT`: Default number of nodes to show when displaying reports and catalog nodes (container variable
+    `REPORTS_COUNT`). Defaults to `100`.
 - `LOCALISE_TIMESTAMP`: If set to `True` then timestamps are shown using your browser's timezone. Otherwise UTC is used. Defaults to `True`.
 - `WITH_EVENT_NUMBERS`: If set to `True` then Overview and Nodes list shows exact number of changed resources
     in the last report. Otherwise shows only 'some' string if there are resources with given status. Setting this
@@ -342,7 +286,8 @@ Other settings that might be interesting, in no particular order:
 
 ## Getting Help<a id="getting-help"></a>
 
-For questions or bug reports you can file an [issue](https://github.com/voxpupuli/puppetboard/issues).
+For questions or bug reports you can file an [issue](https://github.com/DennisPohlmann/puppetboard/issues).
+Security problems please report privately, see [SECURITY.md](.github/SECURITY.md).
 
 ## Contributing<a id="contributing"></a>
 
@@ -352,18 +297,15 @@ Puppetboard relies on the [pypuppetdb](https://pypi.org/project/pypuppetdb/) lib
 and is built with the help of the [Flask](https://flask.palletsprojects.com) microframework.
 
 The recommended way to hack on Puppetboard is to:
-1. fork/clone the Github repository;
-2. create a work virtualenv;
+1. clone the GitHub repository;
+2. create a virtual environment;
 ```bash
-$ python -m venv venv
-$ . venv/bin/activate # run `deactivate` to exit the virtualenv
+$ python3 -m venv venv
+$ . venv/bin/activate # run `deactivate` to exit the virtual environment
 ```
-3. install requirements.
+3. install the package and the test requirements.
 ```bash
-$ pip install --upgrade wheel setuptools
-$ pip install -e .
-$ pip install --upgrade -r requirements-test.txt
-$ mypy --install-types --non-interactive puppetboard/ test/
+$ pip install -r requirements-test.txt -e .
 ```
 
 You can then run the tests with:
@@ -375,31 +317,11 @@ pylint --errors-only puppetboard test
 And you can run the app by executing:
 
 ```bash
-$ export PUPPETBOARD_SETTINGS=$PWD/settings.py # See bellow
-$ flask run
+$ export PUPPETBOARD_SETTINGS=$PWD/settings.py # see settings.py.sample
+$ flask --app puppetboard.app run
 ```
 
-You can specify listening host and port with environment variables or command line otions:
-
-```bash
-$ export FLASK_RUN_HOST=0.0.0.0
-$ export FLASK_RUN_PORT=8000
-
-$ flask run
-```
-
-or
-
-```bash
-$ flask run --host '0.0.0.0' --port '8000'
-```
-
-Use `PUPPETBOARD_SETTINGS` to change the different settings or patch `default_settings.py` directly.
-Take care not to include your local changes on that file when submitting patches for Puppetboard.
-Place a `settings.py` file inside the base directory of the git repository that will be used, if the environment
-variable is not set.
-
-We welcome contributions to this project. However, there are a few ground rules contributors should be aware of.
+Host and port can be set with `--host` and `--port`. Every change comes with matching unit tests.
 
 ### License
 
