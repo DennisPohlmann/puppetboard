@@ -273,7 +273,7 @@ def facts(env):
     structured = set()
     if base_facts:
         paths = get_or_abort(puppetdb._query, 'fact-paths',
-                             query=dumps(['extract', ['name', 'path'], ['>', 'depth', 0]]))
+                             query=dumps(['>', 'depth', 0]))
         structured = {row['name'] for row in paths or [] if isinstance(row['path'][1], str)}
     expanded_facts = []
 
