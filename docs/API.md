@@ -96,7 +96,7 @@ entry point.
 | `MCP_ALLOWED_ORIGINS` | `MCP_ALLOWED_ORIGINS` (comma separated) | empty | `Origin` headers accepted, e.g. `https://puppetboard.example.com`. Requests without `Origin` (normal MCP clients) are fine. |
 | `MCP_MAX_REQUEST_BODY` | `MCP_MAX_REQUEST_BODY` | `65536` | Largest request body in bytes. |
 | `MCP_PROTOCOL_VERSIONS` | `MCP_PROTOCOL_VERSIONS` (comma separated) | `2025-06-18,2025-11-25,2026-07-28` | Accepted `MCP-Protocol-Version` headers. |
-| `API_RATE_LIMIT` | `API_RATE_LIMIT` | `120` | Shared with the API, requests per minute and client. |
+| `API_RATE_LIMIT` | `API_RATE_LIMIT` | `120` | Same setting as for the API, requests per minute and client, counted separately for `/mcp`. |
 | `ENABLE_QUERY` | `ENABLE_QUERY` | `True` | Offers the `run_pql` tool. |
 
 ### Tools

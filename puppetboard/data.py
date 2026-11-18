@@ -161,7 +161,8 @@ def fact_contents(path, value=None, environment=None, limit=None, offset=None):
         raise InvalidArgument('invalid path')
     parts = path.split('.')
     if '*' in parts:
-        clauses = [['~>', 'path', [re.escape(p) if p != '*' else '.*' for p in parts]]]
+        # ~> matches each element as an unanchored regex, so anchor the literal ones
+        clauses = [['~>', 'path', [f'^{re.escape(p)}$' if p != '*' else '.*' for p in parts]]]
     else:
         clauses = [['=', 'path', parts]]
     if value not in (None, ''):
