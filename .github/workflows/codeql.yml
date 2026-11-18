@@ -1,0 +1,38 @@
+name: codeql
+
+# Static analysis of the Python code and the own JavaScript with GitHub
+# CodeQL, "security-extended" queries. Findings appear in the Security tab
+# (code scanning). Runs on every push and pull request and once a week,
+# because new queries arrive without a change here.
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '41 4 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+          config: |
+            paths-ignore:
+              - puppetboard/static/libs
+      - uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:${{ matrix.language }}
