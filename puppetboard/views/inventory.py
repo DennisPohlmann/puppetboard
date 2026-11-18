@@ -1,4 +1,6 @@
 from collections import defaultdict
+
+from markupsafe import Markup
 from flask import (
     render_template, request
 )
@@ -87,7 +89,8 @@ def inventory_ajax(env):
             fact_value = dot_lookup(facts, name) if "." in name else facts.get(name, "")
 
             if name in fact_templates:
-                fact_value = fact_templates[name].render(context, value=fact_value)
+                # autoescaped template output is safe HTML
+                fact_value = Markup(fact_templates[name].render(context, value=fact_value))
             fact_data[node][name] = fact_value
 
     total = len(fact_data)

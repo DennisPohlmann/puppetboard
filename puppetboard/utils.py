@@ -5,6 +5,7 @@ import sys
 from typing import Any, Union
 
 from flask import abort, request, url_for
+from markupsafe import Markup, escape
 from packaging.version import parse
 from pypuppetdb.errors import EmptyResponseError
 from requests.exceptions import ConnectionError, HTTPError
@@ -22,8 +23,28 @@ def url_for_field(field, value):
     return url_for(request.endpoint, **args)
 
 
+def _escape_strings(value):
+    if isinstance(value, str):
+        return str(escape(value))
+    if isinstance(value, dict):
+        return {_escape_strings(k): _escape_strings(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_escape_strings(v) for v in value]
+    return value
+
+
 def jsonprint(value):
-    return json.dumps(value, indent=2, separators=(",", ": "))
+    """JSON for templates whose output is read as HTML (DataTables cells, <pre>).
+
+    Strings are HTML-escaped unless they are already safe markup (e.g. the
+    rendered output of a {% filter jsonprint %} block), so node-controlled
+    data cannot inject HTML.
+    """
+    if isinstance(value, Markup):
+        value = str(value)
+    else:
+        value = _escape_strings(value)
+    return Markup(json.dumps(value, indent=2, separators=(",", ": ")))
 
 
 def check_db_version(puppetdb):

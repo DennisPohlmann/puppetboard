@@ -1,4 +1,6 @@
 from json import dumps
+
+from markupsafe import escape
 from urllib.parse import quote_plus
 
 from flask import (
@@ -129,11 +131,11 @@ def fact_ajax(env, node, fact, value):
     for fact_h in filtered_facts:
         line = []
         if fact is None:
-            line.append(fact_h.name)
+            line.append(str(escape(fact_h.name)))
         if node is None:
             line.append('<a href="{0}">{1}</a>'.format(
-                url_for('node', env=env, node_name=fact_h.node),
-                fact_h.node))
+                escape(url_for('node', env=env, node_name=fact_h.node)),
+                escape(fact_h.node)))
         if value is None:
             if isinstance(fact_h.value, str):
                 # https://github.com/voxpupuli/puppetboard/issues/706
@@ -145,10 +147,9 @@ def fact_ajax(env, node, fact, value):
                 value_for_url = fact_h.value
 
             # Show normal value with link (fast!)
-            line.append('["{0}", {1}]'.format(
-                url_for(
-                    'fact', env=env, fact=fact_h.name, value=value_for_url),
-                dumps(fact_h.value)))
+            line.append(dumps([
+                url_for('fact', env=env, fact=fact_h.name, value=value_for_url),
+                fact_h.value]))
 
         json['data'].append(line)
 

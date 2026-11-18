@@ -5,6 +5,7 @@ import time
 from importlib.metadata import version
 
 from flask import Flask
+from markupsafe import escape
 from flask_caching import Cache
 from flask_apscheduler import APScheduler
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -48,6 +49,9 @@ def get_app():
 
         logging.basicConfig(level=app.config['LOGLEVEL'].upper())
 
+        # The *.json.tpl templates build HTML for DataTables cells: escape them too
+        app.jinja_env.autoescape = lambda name: name is None or name.endswith(
+            ('.html', '.htm', '.xml', '.xhtml', '.svg', '.tpl'))
         app.jinja_env.trim_blocks = True
         app.jinja_env.lstrip_blocks = True
         app.jinja_env.filters['jsonprint'] = jsonprint
@@ -198,9 +202,11 @@ def stream_template(template_name, **context):
 
 
 def get_raw_error(source: str, message: str) -> str:
+    """Report log entry as HTML; the node-controlled text is escaped."""
     # prefix with source, if it's not trivial
     if source != 'Puppet':
         message = source + "\n\n" + message
+    message = str(escape(message))
 
     if '\n' in message:
         message = f"<pre>{message}</pre>"
@@ -256,6 +262,9 @@ def get_friendly_error(source: str, message: str, certname: str) -> str:
 
 
 def to_html(message: str) -> str:
+    """Plain text (e.g. from get_friendly_error) as HTML; the text is escaped."""
+    message = str(escape(message))
+
     # replace \n with <br/> to not have to use <pre> which breaks wrapping
     message = re.sub(r"\n", "<br/>", message)
 

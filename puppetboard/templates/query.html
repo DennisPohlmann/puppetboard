@@ -187,7 +187,13 @@
             "title": "{{ quote_columns_data(column) }}",
     {% if column in ['node', 'certname'] %}
             "render": function (data, type, full, meta) {
-                return `<a href='{{ url_for("node", node_name="") }}${data}'>${data}</a>`
+                return `<a href='{{ url_for("node", node_name="") }}${encodeURIComponent(data)}'>${escape_html(data)}</a>`
+            },
+    {% else %}
+            // node data, shown as text
+            "render": function (data, type, full, meta) {
+                if (type !== 'display') return data;
+                return escape_html(typeof data === 'string' ? data : JSON.stringify(data));
             },
     {% endif %}
         },
