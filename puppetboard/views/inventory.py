@@ -1,6 +1,6 @@
 from collections import defaultdict
 from flask import (
-    render_template, request, render_template_string
+    render_template, request
 )
 from pypuppetdb.QueryBuilder import (AndOperator,
                                      EqualsOperator, OrOperator)
@@ -59,7 +59,11 @@ def inventory_ajax(env):
     envs = environments()
     check_env(env, envs)
     headers, fact_names = inventory_facts()
-    fact_templates = app.config['INVENTORY_FACT_TEMPLATES']
+    # compile each template once per request, not once per node and fact
+    context = {'current_env': env}
+    app.update_template_context(context)
+    fact_templates = {name: app.jinja_env.from_string(source)
+                      for name, source in app.config['INVENTORY_FACT_TEMPLATES'].items()}
 
     query = AndOperator()
     fact_query = OrOperator()
@@ -83,12 +87,7 @@ def inventory_ajax(env):
             fact_value = dot_lookup(facts, name) if "." in name else facts.get(name, "")
 
             if name in fact_templates:
-                fact_template = fact_templates[name]
-                fact_value = render_template_string(
-                    fact_template,
-                    current_env=env,
-                    value=fact_value,
-                )
+                fact_value = fact_templates[name].render(context, value=fact_value)
             fact_data[node][name] = fact_value
 
     total = len(fact_data)

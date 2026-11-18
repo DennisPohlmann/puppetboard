@@ -259,3 +259,6 @@ def test_inventory_json(
     assert len(result_json["data"]) == 3
     assert result_json["data"][0][3] == "amd64"
     assert result_json["data"][0][1] == "192.168.0.2"
+    # columns rendered through INVENTORY_FACT_TEMPLATES (url_for, context processor)
+    assert result_json["data"][0][0] == '<a href="/node/node-debian.test.domain">node-debian</a>'
+    assert result_json["data"][0][2] == "Debian"
