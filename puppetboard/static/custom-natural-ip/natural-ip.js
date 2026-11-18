@@ -17,7 +17,8 @@
 jQuery.extend(jQuery.fn.dataTableExt.oSort, {
     "natural-ip-pre": function (data) {
         // Strip HTML tags and whitespace
-        data = String(data).replace(/<[^>]*>/g, '').replace(/</g, '').trim();
+        // text content via an inert parse: complete, unlike a tag-stripping regex
+        data = new DOMParser().parseFromString(String(data), 'text/html').body.textContent.trim();
 
         // Convert IPv4 "a.b.c.d" to a zero-padded sortable string "aaa.bbb.ccc.ddd"
         var match = data.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);

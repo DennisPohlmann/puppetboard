@@ -18,7 +18,8 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
     "natural-size-pre": function (data) {
         // DataTables strips HTML before passing to sort functions.
         // Strip any remaining tags just in case, then trim whitespace.
-        data = String(data).replace(/<[^>]*>/g, '').replace(/</g, '').trim();
+        // text content via an inert parse: complete, unlike a tag-stripping regex
+        data = new DOMParser().parseFromString(String(data), 'text/html').body.textContent.trim();
 
         var units = {
             'b':   1,
