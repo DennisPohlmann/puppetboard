@@ -1,7 +1,8 @@
 from collections import OrderedDict
 
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, SelectField, TextAreaField, validators)
+from wtforms import (BooleanField, SelectChoice, SelectField, TextAreaField,
+                     validators)
 
 from puppetboard.core import get_app
 
@@ -31,6 +32,6 @@ class QueryForm(FlaskForm):
     query = TextAreaField('Query', [validators.DataRequired(
         message='A query is required.')])
     endpoints = SelectField('API endpoint', choices=[
-        (key, value) for key, value in QUERY_ENDPOINTS.items()
+        SelectChoice(key, value) for key, value in QUERY_ENDPOINTS.items()
         if key in ENABLED_QUERY_ENDPOINTS], default='pql')
     rawjson = BooleanField('Raw JSON')
