@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install python3-poetry
-          poetry install --with=test
+          poetry install --with=test --extras mcp
           poetry run mypy --install-types --non-interactive puppetboard/ test/
       - name: Test
         run: |
@@ -70,7 +70,7 @@ jobs:
       - name: Run bandit
         run: |
           sudo apt install python3-poetry
-          poetry install --with=test
+          poetry install --with=test --extras mcp
           poetry run bandit -r puppetboard
 
   tests:
