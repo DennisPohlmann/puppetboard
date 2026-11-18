@@ -13,6 +13,9 @@ log = logging.getLogger(__name__)
 
 
 def url_for_field(field, value):
+    if request.endpoint is None:
+        # unmatched URL (404 page): no view to rebuild, link to the overview
+        return url_for('index', **{field: value})
     args = request.view_args.copy()
     args.update(request.args.copy())
     args[field] = value

@@ -14,6 +14,12 @@ def test_no_env(client, mock_puppetdb_environments):
     assert rv.status_code == 404
 
 
+def test_unmatched_url(client, mock_puppetdb_environments):
+    rv = client.get('/node/foo/no/such/page')
+
+    assert rv.status_code == 404
+
+
 def test_offline_mode(client, mocker,
                       mock_puppetdb_environments,
                       mock_puppetdb_default_nodes):
