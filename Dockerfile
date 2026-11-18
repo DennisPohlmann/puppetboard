@@ -1,5 +1,9 @@
+# Base images (Chainguard Python on Wolfi) pinned by digest in both FROM lines,
+# so Dependabot can update them: a new digest behind the same tag is a Wolfi or
+# Python patch. The tags must stay in step, build and runtime share one Python.
+#
 # Build stage: has pip and a shell, installs everything into a venv.
-FROM cgr.dev/chainguard/python:latest-dev AS build
+FROM cgr.dev/chainguard/python:latest-dev@sha256:88d8715285b78746679a86fa126fe01e68b7940c3299ee3b4cf8245d4b17095f AS build
 USER root
 WORKDIR /usr/src/app
 COPY . .
@@ -11,7 +15,7 @@ RUN python -m venv /opt/puppetboard \
 
 # Runtime stage: Wolfi-based, no shell, no package manager, no pip. Only
 # Python and the venv, run as the unprivileged user puppetboard (uid 10001).
-FROM cgr.dev/chainguard/python:latest
+FROM cgr.dev/chainguard/python:latest@sha256:d914788ef74519450a69bc5cce6a1cc747dbefb95a3d431daa4ff707767fea8a
 
 LABEL org.label-schema.maintainer="Voxpupuli Team <info@voxpupuli.org>" \
       org.label-schema.vendor="Voxpupuli" \
