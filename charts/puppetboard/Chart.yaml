@@ -5,8 +5,8 @@ description: >-
   existing PuppetDB.
 type: application
 # Released together with the app: chart and app version follow the release tag.
-version: 8.1.0
-appVersion: "8.1.0"
+version: 8.2.0
+appVersion: "8.2.0"
 kubeVersion: ">=1.25.0-0"
 home: https://github.com/DennisPohlmann/puppetboard
 sources:

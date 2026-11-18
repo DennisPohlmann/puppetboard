@@ -2,7 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased (fork DennisPohlmann/puppetboard, based on 8.1.0)
+## [8.2.0](https://github.com/DennisPohlmann/puppetboard/tree/8.2.0) (2026-11-18)
+
+First release of the fork DennisPohlmann/puppetboard, based on 8.1.0.
 
 **New**
 
@@ -30,6 +32,11 @@ All notable changes to this project will be documented in this file.
 - 500 instead of 404 for unknown URLs.
 - XLSX export on the query page in offline mode (JSZip was not loaded).
 - Certnames matched as regex in friendly error messages; client values could forge API audit log lines.
+- Stored and reflected XSS: node data (facts, certnames, report logs, configuration version, event values) and
+  URL parameters were rendered as HTML on several pages; now escaped everywhere.
+- API and MCP served catalog resources while `ENABLE_CATALOG` was off.
+- MCP rate limit and audit log could be keyed on a client-chosen X-Forwarded-For address.
+- Release workflows publish only from tags on `main` that match the package version, after the unit tests.
 
 **Removed**
 
