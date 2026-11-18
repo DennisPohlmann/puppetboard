@@ -21,3 +21,5 @@ The tag starts two workflows:
   GitHub release.
 - `publish-docker.yml` builds the image for amd64 and arm64 and pushes
   `ghcr.io/dennispohlmann/puppetboard:<version>` and `:latest`.
+- `chart.yml` checks the Helm chart and pushes it with the tag as chart and
+  app version to `oci://ghcr.io/dennispohlmann/charts/puppetboard`.

@@ -4,8 +4,10 @@ Puppetboard (web interface, read-only JSON API and MCP server) for an
 **existing PuppetDB**. The chart ships only Puppetboard; PuppetDB, Puppet
 Server and the agents are yours.
 
+Released versions are on ghcr.io as OCI chart, with the same version as the app:
+
 ```bash
-helm install puppetboard ./charts/puppetboard \
+helm install puppetboard oci://ghcr.io/dennispohlmann/charts/puppetboard --version 8.2.0 \
   --namespace puppetboard --create-namespace \
   --set secretKey="$(openssl rand -hex 32)" \
   --set puppetdb.host=puppetdb.example.com \
@@ -103,4 +105,5 @@ docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD/charts/puppetbo
 ```
 
 The CI workflow `chart.yml` runs lint, the unit tests and kubeconform on every
-push.
+push, and on a release tag pushes the chart to `oci://ghcr.io/dennispohlmann/charts`.
+From the checkout, `./charts/puppetboard` works in place of the OCI address.

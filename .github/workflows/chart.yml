@@ -2,7 +2,8 @@ name: chart
 
 # Checks the Helm chart in charts/puppetboard on every push and pull request:
 # helm lint (default and ci values, values.schema.json), unit tests
-# (helm-unittest) and kubeconform against the Kubernetes API.
+# (helm-unittest) and kubeconform against the Kubernetes API. On a release
+# tag it also publishes the chart as OCI artifact on ghcr.io (job publish).
 on:
   push:
   pull_request:
@@ -39,3 +40,32 @@ jobs:
           done
       - name: package (check only, not pushed)
         run: helm package "$CHART" --destination dist
+
+  # On a release tag (plain version, e.g. 8.2.0): package the chart with the
+  # tag as chart and app version and push it to
+  # oci://ghcr.io/dennispohlmann/charts/puppetboard.
+  publish:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: azure/setup-helm@v5
+        with:
+          version: ${{ env.HELM_VERSION }}
+      - name: check the tag is a plain version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          [[ "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::tag $TAG is not a plain version"; exit 1; }
+      - name: package and push
+        env:
+          TAG: ${{ github.ref_name }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GHCR_TOKEN" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
+          helm package "$CHART" --version "$TAG" --app-version "$TAG" --destination dist
+          helm push "dist/puppetboard-$TAG.tgz" oci://ghcr.io/dennispohlmann/charts
