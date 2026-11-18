@@ -11,7 +11,7 @@ Puppetboard is a web interface to [PuppetDB](https://puppet.com/docs/puppetdb/la
 the reporting functionality of [Puppet Enterprise console (previously: Puppet Dashboard)](https://puppet.com/docs/pe/latest/console_accessing.html)
 for the open source Puppet.
 
-![Overview](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/overview.png)
+![Overview](screenshots/overview.png)
 
 See [more screenshots here](#more-screenshots).
 
@@ -430,59 +430,67 @@ please see: [RELEASE.md](RELEASE.md)
 
 * Overview / Index / Homepage
 
-![Overview / Index / Homepage](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/overview.png)
+![Overview / Index / Homepage](screenshots/overview.png)
 
 * Nodes view, all active nodes
 
-![Nodes view, all active nodes](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/nodes.png)
+![Nodes view, all active nodes](screenshots/nodes.png)
 
 * Single node page / overview
 
-![Single node page / overview](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/node.png)
+![Single node page / overview](screenshots/node.png)
 
 * Report view
 
-![Report view](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/report.png)
+![Report view](screenshots/report.png)
+
+* Failures view, the errors of all failing nodes
+
+![Failures view](screenshots/failures.png)
 
 * Facts view
 
-![Facts view](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/facts.png)
+![Facts view](screenshots/facts.png)
 
 * Single fact, with graphs
 
-![Single fact, with graphs](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/fact.png)
+![Single fact, with graphs](screenshots/fact.png)
 
 * All nodes that have this fact with that value
 
-![All nodes that have this fact with that value](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/fact_value.png)
+![All nodes that have this fact with that value](screenshots/fact_value.png)
 
 * Query view - results as table
 
-![Query view](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/query_result_table.png)
+![Query view](screenshots/query_result_table.png)
 
 * Query view - results as JSON
 
-![Query view](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/query_result_json.png)
+![Query view](screenshots/query_result_json.png)
 
 * Metrics view
 
-![Metrics view](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/metrics.png)
+![Metrics view](screenshots/metrics.png)
 
 * Single metric
 
-![Single metric](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/metric.png)
+![Single metric](screenshots/metric.png)
 
 * Inventory view
 
-![Inventory view](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/inventory.png)
+![Inventory view](screenshots/inventory.png)
 
 * Classes view, group the resource events of the last reports by Puppet class
 
-![Classes view](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/classes.png)
+![Classes view](screenshots/classes.png)
 
 * Class view, list the nodes with almost one resource event for a given class
 
-![Class view](https://raw.githubusercontent.com/voxpupuli/puppetboard/master/screenshots/class.png)
+![Class view](screenshots/class.png)
+
+* Radiator view, for a wall display
+
+![Radiator view](screenshots/radiator.png)
 
 # Legal<a id="legal"></a>
 
