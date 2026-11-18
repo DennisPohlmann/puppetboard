@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased (fork DennisPohlmann/puppetboard, based on 8.1.0)
+
+**New**
+
+- Read-only JSON API under `/api/v1/` (`ENABLE_API`), documented as OpenAPI 3.1, see [docs/API.md](docs/API.md).
+- Read-only MCP server under `/mcp` (`ENABLE_MCP`) on the ASGI entry point `puppetboard.asgi:app`.
+- API and MCP follow the CIS API Security Guide and the CIS MCP Server Benchmark: input validation, limits,
+  rate limit, audit log; authentication belongs in the reverse proxy.
+- Published as `puppetboard-dp` on PyPI (Trusted Publishing) and as `ghcr.io/dennispohlmann/puppetboard`.
+
+**Changed**
+
+- Container: official `python:3.15-alpine` pinned by digest, gunicorn ASGI worker, user `puppetboard` (uid 10001),
+  port **8080** instead of 80, no compiler and no pip in the image.
+- JavaScript libraries: DataTables 3.1.5, Buttons 4.1.3, Fomantic-UI 2.9.4 (Lato now bundled), jQuery 4.1.0,
+  billboard.js 4.1.5, Moment.js 2.31.0, JSZip 3.10.2.
+- Python dependencies updated; Python 3.12 to 3.15 supported.
+- Faster pages with many nodes: facts overview, failures, inventory, nodes, daily chart; environment list cached
+  for 60 s.
+- Release tags are plain versions without `v` (e.g. `8.2.0`).
+
+**Fixed**
+
+- 500 instead of 404 for unknown URLs.
+- XLSX export on the query page in offline mode (JSZip was not loaded).
+- Certnames matched as regex in friendly error messages; client values could forge API audit log lines.
+
+**Removed**
+
+- Docker Hub publishing, the OpenShift template, `setup.py`, `MANIFEST.in`, the Ruby changelog tooling and the
+  CentOS 7 / Debian Jessie guides.
+
 ## [v8.1.0](https://github.com/voxpupuli/puppetboard/tree/v8.1.0) (2026-10-12)
 
 [Full Changelog](https://github.com/voxpupuli/puppetboard/compare/v8.0.0...v8.1.0)
