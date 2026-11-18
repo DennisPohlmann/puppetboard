@@ -84,8 +84,8 @@ gunicorn -k asgi puppetboard.asgi:app
 ```
 
 The classic WSGI entry point `puppetboard.app:app` keeps working without MCP.
-Install the extra dependencies from `requirements-docker.txt` for the ASGI
-entry point.
+Outside the container install the package with the `mcp` extra:
+`pip install 'puppetboard-dp[mcp]'`.
 
 ### MCP settings
 

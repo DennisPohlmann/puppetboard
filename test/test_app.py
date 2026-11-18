@@ -119,3 +119,9 @@ def test_custom_title(client, mocker,
 
     # restore the global state
     app.app.config['PAGE_TITLE'] = default_title
+
+
+def test_footer_links_to_fork(client, mock_puppetdb_environments, mock_puppetdb_default_nodes):
+    page = client.get('/nodes').get_data(as_text=True)
+    assert 'href="https://github.com/DennisPohlmann/puppetboard"' in page
+    assert 'github.com/voxpupuli/puppetboard"' not in page

@@ -13,10 +13,10 @@ A clear and concise description of what the bug is.
 
 **Puppetboard version**
 
-F.e. 4.0.1
+F.e. 8.2.0
 
 **Environment and installation method**
 
 F.e.:
-* Centos 7 and Python 3.8 from Software Collections,
-* installed with the Forge module v9.0.0 and using the PyPI package (default).
+* container image ghcr.io/dennispohlmann/puppetboard:8.2.0 with Podman on RHEL 10,
+* or the PyPI package puppetboard-dp 8.2.0 with Python 3.12 and gunicorn (WSGI or ASGI).

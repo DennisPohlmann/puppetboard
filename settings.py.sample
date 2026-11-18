@@ -5,7 +5,7 @@
 # file.
 #
 # Please refer to the following URL for a list of available variables:
-# https://github.com/voxpupuli/puppetboard#app-settings
+# https://github.com/DennisPohlmann/puppetboard#app-settings
 #
 # If you are not accessing PuppetDB locally, set the following variables:
 #
