@@ -163,3 +163,7 @@ def test_openapi(api_client):
     assert rv.status_code == 200
     assert rv.json['openapi'].startswith('3.')
     assert '/nodes/{certname}/facts' in rv.json['paths']
+
+
+def test_audit_log_cannot_be_forged():
+    assert api.log_safe('a\r\nfake line\\') == 'a\\r\\nfake line\\\\'

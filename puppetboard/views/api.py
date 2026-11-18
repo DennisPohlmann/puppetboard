@@ -29,6 +29,11 @@ def error(status, message):
     return response
 
 
+def log_safe(value):
+    """Client-controlled text for the audit log: no line breaks, no forged lines."""
+    return str(value).replace('\\', '\\\\').replace('\r', '\\r').replace('\n', '\\n')
+
+
 def listing(rows, limit, offset):
     return jsonify({'data': rows, 'meta': {'limit': limit, 'offset': offset, 'count': len(rows)}})
 
@@ -50,9 +55,10 @@ def headers_and_audit(response):
     response.headers['Cache-Control'] = 'no-store'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     if 'api_start' in g:
-        audit.info('api ts=%s method=%s path=%r status=%s client=%s duration_ms=%d',
-                   datetime.now(timezone.utc).isoformat(), request.method, request.full_path, response.status_code,
-                   request.remote_addr, (time.monotonic() - g.api_start) * 1000)
+        audit.info('api ts=%s method=%s path=%s status=%s client=%s duration_ms=%d',
+                   datetime.now(timezone.utc).isoformat(), log_safe(request.method),
+                   log_safe(request.full_path), response.status_code,
+                   log_safe(request.remote_addr), (time.monotonic() - g.api_start) * 1000)
     return response
 
 
