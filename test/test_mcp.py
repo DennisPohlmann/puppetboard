@@ -56,7 +56,7 @@ def test_find_fact_values_wildcard(pdb_query):
     call('find_fact_values', {'path': 'packages.*.version', 'value_regex': '^3'})
     query = json.loads(pdb_query.call_args.kwargs['query'])
     assert query == ['and', ['~>', 'path', ['^packages$', '.*', '^version$']],
-                     ['~', 'value', '^3']]
+                     ['=', 'name', 'packages'], ['~', 'value', '^3']]
 
 
 def test_invalid_arguments_rejected(pdb_query):
