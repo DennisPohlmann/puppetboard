@@ -603,27 +603,12 @@ def test_facts_page_shows_structured_facts_as_parents(client, mocker,
     # Mock fact names
     fact_names_query = {'fact-names': [fact_names]}
 
-    # Mock fact values - os is structured, others are simple
-    facts_query = {'facts': []}
-    facts_query['facts'].append([])
-    facts_query['facts'][0].append({
-        'certname': 'node-1',
-        'name': 'hostname',
-        'value': 'server01',
-        'environment': 'production'
-    })
-    facts_query['facts'][0].append({
-        'certname': 'node-1',
-        'name': 'os',
-        'value': {'name': 'Ubuntu', 'release': {'full': '20.04'}},
-        'environment': 'production'
-    })
-    facts_query['facts'][0].append({
-        'certname': 'node-1',
-        'name': 'kernel',
-        'value': 'Linux',
-        'environment': 'production'
-    })
+    # Leaf paths: os is structured, hostname and kernel are simple
+    facts_query = {'fact-paths': [[
+        {'name': 'os', 'path': ['os', 'name']},
+        {'name': 'os', 'path': ['os', 'release', 'full']},
+        {'name': 'hostname', 'path': ['hostname', 0]},  # an array, not expandable
+    ]]}
 
     query_data = {**fact_names_query, **facts_query}
     dbquery = MockDbQuery(query_data)

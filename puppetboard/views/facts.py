@@ -267,53 +267,19 @@ def facts(env):
     fact_names = get_or_abort(puppetdb.fact_names)
     base_facts = sorted(fact_names) if fact_names else []
 
-    # Build query for environment filter
-    query = AndOperator()
-    if env != '*':
-        query.add(EqualsOperator("environment", env))
-
-    # if we have not added any operations to the query,
-    # then make it explicitly empty
-    if len(query.operations) == 0:
-        query = None
-
-    # Efficiently detect structured facts by sampling just ONE fact value per fact name
-    # This avoids the N+1 query problem by using a single bulk query
-    expanded_facts = []
-
-    fact_samples = {}
-    fact_all_keys = {}  # Track ALL keys seen across all nodes for dict facts
-
-    # Only query for fact samples if we have facts to check
+    # Structured (dict) facts are those with a leaf path whose second element is
+    # a key. fact-paths holds one row per distinct path, so this stays small
+    # where fetching every fact value of every node did not.
+    structured = set()
     if base_facts:
-        # Get ALL facts in one query to detect structure AND collect all keys
-        # This is MUCH faster than querying each fact individually
-        try:
-            all_facts = get_or_abort(puppetdb.facts, query=query)
-
-            if all_facts:  # Handle None or empty results
-                for fact_obj in all_facts:
-                    fact_name = fact_obj.name
-
-                    # Keep first sample value for structure detection
-                    if fact_name not in fact_samples:
-                        fact_samples[fact_name] = fact_obj.value
-
-                    # For dict facts, collect ALL keys across all nodes
-                    # This ensures we show complete list for variable-key facts
-                    if isinstance(fact_obj.value, dict):
-                        if fact_name not in fact_all_keys:
-                            fact_all_keys[fact_name] = set()
-                        fact_all_keys[fact_name].update(fact_obj.value.keys())
-        except (TypeError, AttributeError):
-            # Handle test scenarios where facts query may not be properly mocked
-            pass
+        paths = get_or_abort(puppetdb._query, 'fact-paths',
+                             query=dumps(['extract', ['name', 'path'], ['>', 'depth', 0]]))
+        structured = {row['name'] for row in paths or [] if isinstance(row['path'][1], str)}
+    expanded_facts = []
 
     # Now expand structured facts - group by parent
     for base_fact in base_facts:
-        sample_value = fact_samples.get(base_fact)
-
-        if sample_value is not None and isinstance(sample_value, dict):
+        if base_fact in structured:
             # This is a structured fact - add as collapsible parent with lazy-loaded children
             expanded_facts.append({
                 'name': base_fact,
