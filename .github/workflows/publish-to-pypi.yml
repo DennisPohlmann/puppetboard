@@ -3,7 +3,8 @@ name: publish 🐍 egg to PyPI
 on:
   push:
     tags:
-      - "v*"
+      # release tags are plain versions without a v, e.g. 8.2.0
+      - "[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   build-n-publish:
