@@ -13,10 +13,6 @@ To run Puppetboard in production we provide instructions for the following scena
 
 If you deploy Puppetboard through a different setup we'd welcome a pull request that adds the instructions to this section.
 
-Installation On Linux Distros \^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^\^
-
-[Debian Jessie Install](docs/Debian-Jessie.md).
-
 ## Apache + mod_wsgi
 
 First we need to create the necessary directories:

@@ -38,8 +38,6 @@ There is a [Puppet module](https://forge.puppetlabs.com/puppet/puppetboard) orig
  [Spencer Krum](https://github.com/nibalizer) and currently maintained by [Voxpupuli](https://voxpupuli.org/)
 that takes care of installing the Puppetboard for you.
 
-To see how to get it working with RedHat/Centos 7 check out these [docs](https://github.com/voxpupuli/puppetboard/blob/master/docs/EL7.md).
-
 ### Using Docker
 
 The container image of this fork is published in the
