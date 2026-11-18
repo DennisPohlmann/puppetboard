@@ -175,5 +175,5 @@ MCP benchmark 2.2, 2.3, 3.1, 3.3) are delegated to the reverse proxy by design.
 | 5.6 side effects | None, every tool is read-only. |
 | 6.1 minimal context | Small default limits, trimmed node fields, fact name filter; PuppetDB errors are not passed to the model. |
 | 7.1.1 to 7.1.3 audit | One JSON line per request in `puppetboard.audit`: UTC timestamp, client, JSON-RPC method, id, tool, protocol version, status, duration; requests with a null id are refused. |
-| 9.1 isolation | Container image without shell or package manager, runs as the unprivileged user `puppetboard` on port 8080. |
+| 9.1 isolation | Container image without compiler and pip, runs as the unprivileged user `puppetboard` on port 8080. |
 | 10.2 limits | Body size limit, rate limit per client, paging bounds. |

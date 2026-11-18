@@ -62,8 +62,7 @@ docker run -it \
 With `--net=host` next to PuppetDB, `PUPPETBOARD_PORT` must differ from PuppetDB's port 8080.
 Note: you must provide a secret key! Generate one for example by running `ruby -e "require 'securerandom'; puts SecureRandom.hex(32)"`.
 
-The image is based on Chainguard's minimal Python image: it has no shell and no package manager
-(`docker exec ... sh` does not work) and runs as the unprivileged user `puppetboard` (uid 10001). It listens on
+The image is based on the official `python:3.15-alpine` image, pinned by digest, without compiler and pip. It runs as the unprivileged user `puppetboard` (uid 10001). It listens on
 port **8080** (`PUPPETBOARD_PORT`); images before this change used port 80, so adjust your port mapping or proxy.
 
 Optionally you can set `PUPPETBOARD_URL_PREFIX` env variable to a value like `/puppetboard` to run the app under a URL prefix.
