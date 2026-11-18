@@ -44,7 +44,7 @@ def jsonprint(value):
         value = str(value)
     else:
         value = _escape_strings(value)
-    return Markup(json.dumps(value, indent=2, separators=(",", ": ")))
+    return Markup(json.dumps(value, indent=2, separators=(",", ": ")))  # nosec B704 - every string escaped above
 
 
 def check_db_version(puppetdb):

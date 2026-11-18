@@ -90,7 +90,7 @@ def inventory_ajax(env):
 
             if name in fact_templates:
                 # autoescaped template output is safe HTML
-                fact_value = Markup(fact_templates[name].render(context, value=fact_value))
+                fact_value = Markup(fact_templates[name].render(context, value=fact_value))  # nosec B704
             fact_data[node][name] = fact_value
 
     total = len(fact_data)
