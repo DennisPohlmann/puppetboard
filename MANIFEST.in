@@ -1,7 +1,0 @@
-include README.md
-include CHANGELOG.md
-include LICENSE
-include THIRD_PARTY.md
-recursive-include puppetboard/static *
-recursive-include puppetboard/templates *
-include requirements*.txt

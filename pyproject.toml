@@ -1,44 +1,67 @@
-[tool.poetry]
+[project]
 name = "puppetboard-dp"
 version = "8.1.0"
-description = "Web frontend for PuppetDB"
-authors = ["Vox Pupuli <voxpupuli@groups.io>"]
-license = "Apache-2.0"
-readme = "README.md"
-repository = 'https://github.com/DennisPohlmann/puppetboard'
-keywords = ["puppet", "puppetdb", "puppetboard"]
-classifiers = [
-    'Development Status :: 5 - Production/Stable',
-    'Environment :: Web Environment',
-    'Framework :: Flask',
-    'Intended Audience :: System Administrators',
-    'Natural Language :: English',
-    'License :: OSI Approved :: Apache Software License',
-    'Operating System :: POSIX',
+description = "Web frontend, read-only JSON API and MCP server for PuppetDB (fork of puppetboard)"
+authors = [
+    { name = "Vox Pupuli", email = "voxpupuli@groups.io" },
+    { name = "Dennis Pohlmann", email = "50769263+DennisPohlmann@users.noreply.github.com" },
 ]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+readme = "README.md"
+requires-python = ">=3.12,<4"
+keywords = ["puppet", "puppetdb", "puppetboard", "mcp"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: Flask",
+    "Intended Audience :: System Administrators",
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+]
+dependencies = [
+    "click>=8.1.7,<9",
+    "flask>=3.1.0,<4",
+    "commonmark>=0.9.1,<0.10",
+    "flask-apscheduler>=1.13.1,<2",
+    "flask-caching>=2.3.0,<3",
+    "flask-wtf>=1.2.2,<2",
+    "idna>=3.10,<4",
+    "requests>=2.32.3,<3",
+    "packaging>=24.2,<27.0",
+    "pyparsing>=3.2.0,<4",
+    "pypuppetdb>=3.2.0,<4",
+    "PyYAML>=6.0,<7",
+    "typing-extensions>=4.12.2,<5",
+    "wtforms>=3.3.0,<4",
+    "zipp>=3.21,<5.0",
+]
+
+[project.optional-dependencies]
+# ASGI entry point puppetboard.asgi:app with the MCP server, as in the container
+mcp = [
+    "gunicorn>=23,<28",
+    "mcp>=2.3.0,<3",
+    "a2wsgi>=1.10.10,<2",
+]
+
+[project.urls]
+Repository = "https://github.com/DennisPohlmann/puppetboard"
+Upstream = "https://github.com/voxpupuli/puppetboard"
+
+[tool.poetry]
 packages = [
     { include = "puppetboard" },
 ]
-
-
-
-[tool.poetry.dependencies]
-python = "^3.12"
-click = "^8.1.7"
-flask = "^3.1.0"
-commonmark = "^0.9.1"
-flask-apscheduler = "^1.13.1"
-flask-caching = "^2.3.0"
-flask-wtf = "^1.2.2"
-idna = "^3.10"
-requests = "^2.32.3"
-packaging = ">=24.2,<27.0"
-pyparsing = "^3.2.0"
-pypuppetdb = "^3.2.0"
-PyYAML = "^6.0"
-typing-extensions = "^4.12.2"
-wtforms = "^3.3.0"
-zipp = ">=3.21,<5.0"
+include = [
+    { path = "THIRD_PARTY.md", format = "sdist" },
+    { path = "CHANGELOG.md", format = "sdist" },
+]
 
 
 [tool.poetry.group.test.dependencies]
@@ -61,11 +84,6 @@ types-setuptools = ">=75.6.0.20241126,<85.0.0.0"
 types-toml = "^0.10.8.20240310"
 
 
-[tool.poetry.group.docker.dependencies]
-gunicorn = ">=23,<28"
-mcp = "^2.3.0"
-a2wsgi = "^1.10.10"
-
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"
