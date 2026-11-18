@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 
 from flask import (
@@ -97,15 +98,17 @@ def get_daily_reports_chart(db, env, days_number, certname=None):
     certname will be added.  If certname is not passed, all reports in
     the database will be considered.
     """
-    result = []
-    for start, end in _iter_dates(days_number, reverse=True):
+    def one_day(day_range):
+        start, end = day_range
         query = _build_query(
             env=env,
             start=start.strftime(DATETIME_FORMAT),
             end=end.strftime(DATETIME_FORMAT),
             certname=certname,
         )
-        day = start.strftime(DATE_FORMAT)
-        output = db._query('reports', query=query)
-        result.append(_format_report_data(day, output))
-    return result
+        return _format_report_data(start.strftime(DATE_FORMAT),
+                                   db._query('reports', query=query))
+
+    # one count query per day; run them side by side instead of one after another
+    with ThreadPoolExecutor(max_workers=min(days_number, 8) or 1) as pool:
+        return list(pool.map(one_day, _iter_dates(days_number, reverse=True)))
