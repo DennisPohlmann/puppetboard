@@ -72,6 +72,7 @@ def test_offline_static(client):
                 "static/libs/datatables.net-buttons-se/buttons.semanticui.min.js",
                 "static/libs/datatables.net-se/dataTables.semanticui.min.js",
                 "static/libs/billboard.js/billboard.pkgd.min.js",
+                "static/libs/jszip/jszip.min.js",
             ]
 
         }
