@@ -50,9 +50,6 @@ venv
 # IDE files
 .idea
 
-Gemfile.lock
-.bundle
-.vendor
 
 # Taken over from the Vanishly repository
 .env

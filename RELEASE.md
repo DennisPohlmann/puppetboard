@@ -1,29 +1,23 @@
 # How to release
 
-## On a fork do
+Releases of this fork are published as `puppetboard-dp` on PyPI and as
+`ghcr.io/dennispohlmann/puppetboard` in the GitHub Container Registry.
+A release needs Dennis' explicit "RELEASE GO" and a passed security gate.
 
-```shell
-git switch -c release-x.y.z
-```
+1. Set the new version in [pyproject.toml](pyproject.toml), for example with
+   `poetry version minor`, and describe the changes in
+   [CHANGELOG.md](CHANGELOG.md). Commit both (signed) to `main`.
+2. Tag the commit with the plain version, without a `v`, and push the tag:
 
-Edit [pyproject.toml](pyproject.toml) and set future version.  With poetry locally, you can also do `poetry version <patch, minor, major, prepatch, preminor, premajor, prerelease>` to automatically update.
+   ```shell
+   git tag -s 8.2.0 -m 'Release 8.2.0'
+   git push fork 8.2.0
+   ```
 
-```shell
-bundle config set --local path .vendor
-bundle config set --local with 'release'
-bundle install
+The tag starts two workflows:
 
-CHANGELOG_GITHUB_TOKEN="token_MC_token-face" bundle exec rake changelog
-git add -A
-git commit -m 'Release X.Y.Z'
-git push origin releae-x.y.z
-```
-
-## as a maintainer on upstream do
-
-```shell
-git switch master
-git pull
-git tag $version
-git push --tags
-```
+- `publish-to-pypi.yml` builds the package and uploads it to PyPI with
+  Trusted Publishing (environment `pypi`, no API token), then creates the
+  GitHub release.
+- `publish-docker.yml` builds the image for amd64 and arm64 and pushes
+  `ghcr.io/dennispohlmann/puppetboard:<version>` and `:latest`.
