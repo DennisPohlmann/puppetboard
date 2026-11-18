@@ -1,369 +1,144 @@
 # Deployment setups
 
-| ⚠️ These docs may be outdated. Pull Requests with updates are very welcome! |
-| --- |
+Puppetboard needs a reverse proxy in front: it terminates TLS and, if you use
+the JSON API (`/api/v1/`) or the MCP server (`/mcp`), it must authenticate
+clients, because Puppetboard has no authentication of its own (see
+[API.md](API.md#securing-api-and-mcp)).
 
-To run Puppetboard in production we provide instructions for the following scenarios:
+Two ways to run it:
 
--   Apache + mod\_wsgi
--   Apache + mod\_passenger
--   nginx + uwsgi
--   nginx + gunicorn
--   nginx + gunicorn ASGI worker (needed for the MCP server)
+- [Container image](#container-image) (recommended)
+- [Python package with gunicorn and systemd](#python-package-with-gunicorn-and-systemd)
 
-If you deploy Puppetboard through a different setup we'd welcome a pull request that adds the instructions to this section.
+Then put [nginx](#nginx) or [Apache](#apache) in front.
 
-## Apache + mod_wsgi
-
-First we need to create the necessary directories:
-
-``` {.sourceCode .bash}
-$ mkdir -p /var/www/html/puppetboard
-```
-
-Copy Puppetboard's `default_settings.py` to the newly created puppetboard directory and name the file `settings.py`.
-This file will be available at the path Puppetboard was installed, for example: `/usr/local/lib/pythonX.Y/lib/dist-packages/puppetboard/default_settings.py`.
-
-Change the settings that need changing to match your environment and delete or comment with a `#` the rest of the entries.
-
-If you don't need to change any settings you can skip the creation of the `settings.py` file entirely.
-
-Now create a `wsgi.py` with the following content in the newly created puppetboard directory:
-
-``` {.sourceCode .python}
-from __future__ import absolute_import
-import os
-
-# Needed if a settings.py file exists
-os.environ['PUPPETBOARD_SETTINGS'] = '/var/www/html/puppetboard/settings.py'
-from puppetboard.app import app as application
-```
-
-Make sure this file is readable by the user the webserver runs as.
-
-Flask requires a static secret\_key, see [FlaskSession](http://flask.pocoo.org/docs/0.11/quickstart/#sessions),
-in order to protect itself from CSRF exploits. The default secret\_key in `default_settings.py` generates 
-a random 24 character string, however this string is re-generated on each request under httpd \>= 2.4.
-
-To generate your own secret\_key create a python script with the following content and run it once:
-
-``` {.sourceCode .python}
-import os
-os.urandom(24)
-'\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
-```
-
-Copy the output and add the following to your `wsgi.py` file:
-
-``` {.sourceCode .python}
-application.secret_key = '<your secret key>'
-```
-
-The last thing we need to do is configure Apache.
-
-Here is a sample configuration for Debian and Ubuntu:
-
-``` {.sourceCode .apache}
-<VirtualHost *:80>
-    ServerName puppetboard.example.tld
-    WSGIDaemonProcess puppetboard user=www-data group=www-data threads=5
-    WSGIScriptAlias / /var/www/html/puppetboard/wsgi.py
-    ErrorLog /var/log/apache2/puppetboard.error.log
-    CustomLog /var/log/apache2/puppetboard.access.log combined
-
-    Alias /static /usr/local/lib/pythonX.Y/dist-packages/puppetboard/static
-    <Directory /usr/local/lib/pythonX.X/dist-packages/puppetboard/static>
-        Satisfy Any
-        Allow from all
-    </Directory>
-
-    <Directory /usr/local/lib/pythonX.Y/dist-packages/puppetboard>
-        WSGIProcessGroup puppetboard
-        WSGIApplicationGroup %{GLOBAL}
-        Order deny,allow
-        Allow from all
-    </Directory>
-</VirtualHost>
-```
-
-Here is a sample configuration for Fedora:
-
-``` {.sourceCode .apache}
-<VirtualHost *:80>
-    ServerName puppetboard.example.tld
-    WSGIDaemonProcess puppetboard user=apache group=apache threads=5
-    WSGIScriptAlias / /var/www/html/puppetboard/wsgi.py
-    ErrorLog logs/puppetboard-error_log
-    CustomLog logs/puppetboard-access_log combined
-
-    Alias /static /usr/lib/pythonX.Y/site-packages/puppetboard/static
-    <Directory /usr/lib/pythonX.Y/site-packages/puppetboard/static>
-        Satisfy Any
-        Allow from all
-    </Directory>
-
-    <Directory /usr/lib/pythonX.Y/site-packages/puppetboard>
-        WSGIProcessGroup puppetboard
-        WSGIApplicationGroup %{GLOBAL}
-        Require all granted
-    </Directory>
-</VirtualHost>
-```
-
-Note the directory path, it's the path to where pip installed Puppetboard; X.Y must be replaced with your python 
-version. We also alias the `/static` path so that Apache will serve the static files like the included CSS and Javascript.
-
-## Apache + mod_passenger
-
-It is possible to run Python applications through Passenger. Passenger has supported this since version 3 but it's 
-considered experimental. Since the release of Passenger 4 it's a 'core' feature of the product.
-
-Performance wise it also leaves something to be desired compared to the mod\_wsgi powered solution. Application 
-start up is noticeably slower and loading pages takes a fraction longer.
-
-First we need to create the necessary directories:
-
-``` {.sourceCode .bash}
-$ mkdir -p /var/www/puppetboard/{tmp,public}
-```
-
-Copy Puppetboard's `default_settings.py` to the newly created puppetboard directory and name the file `settings.py`.
-This file will be available at the path Puppetboard was installed, for example: `/usr/local/lib/pythonX.Y/lib/dist-packages/puppetboard/default_settings.py`.
-
-Change the settings that need changing to match your environment and delete or comment with a `#` the rest of the entries.
-
-If you don't need to change any settings you can skip the creation of the `settings.py` file entirely.
-
-Now create a `passenger_wsgi.py` with the following content in the newly created puppetboard directory:
-
-``` {.sourceCode .python}
-from __future__ import absolute_import
-import os
-import logging
-
-logging.basicConfig(filename='/path/to/file/for/logging', level=logging.INFO)
-
-# Needed if a settings.py file exists
-os.environ['PUPPETBOARD_SETTINGS'] = '/var/www/puppetboard/settings.py'
-
-try:
-    from puppetboard.app import app as application
-except Exception, inst:
-    logging.exception("Error: %s", str(type(inst)))
-```
-
-Unfortunately due to the way Passenger works we also need to configure logging inside `passenger_wsgi.py` 
-else application start up issues won't be logged.
-
-This means that even though `LOGLEVEL` might be set in your `settings.py` this setting will take precedence over it.
-
-Now the only thing left to do is configure Apache:
-
-``` {.sourceCode .apache}
-<VirtualHost *:80>
-    ServerName puppetboard.example.tld
-    DocumentRoot /var/www/puppetboard/public
-    ErrorLog /var/log/apache2/puppetboard.error.log
-    CustomLog /var/log/apache2/puppetboard.access.log combined
-
-    RackAutoDetect On
-    Alias /static /usr/local/lib/pythonX.Y/dist-packages/puppetboard/static
-</VirtualHost>
-```
-
-Note the `/static` alias path, it's the path to where pip installed Puppetboard. This is needed so that Apache 
-will serve the static files like the included CSS and Javascript.
-
-## nginx + uwsgi/gunicorn
-
-A common Python deployment scenario is to use the uwsgi application server (which can also serve rails/rack, PHP, Perl 
-and other applications) and proxy to it through something like nginx or perhaps even HAProxy.
-
-uwsgi has a feature that every instance can run as its own user. In this example we'll use the `www-data` user 
-but you can create a separate user solely for running Puppetboard and use that instead.
-
-First we need to create the necessary directories:
-
-``` {.sourceCode .bash}
-$ mkdir -p /var/www/puppetboard
-```
-
-Copy Puppetboard's `default_settings.py` to the newly created puppetboard directory and name the file `settings.py`.
-This file will be available at the path Puppetboard was installed,
-for example: `/usr/local/lib/pythonX.Y/lib/dist-packages/puppetboard/default_settings.py`.
-
-Change the settings that need changing to match your environment and delete or comment with a `#` the rest of the entries.
-
-If you don't need to change any settings you can skip the creation of the `settings.py` file entirely.
-
-Now create a `wsgi.py` with the following content in the newly created puppetboard directory:
-
-``` {.sourceCode .python}
-from __future__ import absolute_import
-import os
-
-# Needed if a settings.py file exists
-os.environ['PUPPETBOARD_SETTINGS'] = '/var/www/puppetboard/settings.py'
-from puppetboard.app import app as application
-```
-
-Make sure this file is owned by the user and group the uwsgi instance will run as.
-
-Now we need to start uwsgi:
-
-``` {.sourceCode .bash}
-$ uwsgi --socket :9090 --wsgi-file /var/www/puppetboard/wsgi.py
-```
-
-Feel free to change the port to something other than `9090`.
-
-The last thing we need to do is configure nginx to proxy the requests:
-
-``` {.sourceCode .nginx}
-upstream puppetboard {
-    server 127.0.0.1:9090;
-}
-
-server {
-    listen      80;
-    server_name puppetboard.example.tld;
-    charset     utf-8;
-
-    location /static {
-        alias /usr/local/lib/pythonX.Y/dist-packages/puppetboard/static;
-    }
-
-    location / {
-        uwsgi_pass puppetboard;
-        include    /path/to/uwsgi_params/probably/etc/nginx/uwsgi_params;
-    }
-}
-```
-
-If all went well you should now be able to access to Puppetboard. Note the `/static` location block to make nginx 
-serve static files like the included CSS and Javascript.
-
-Because nginx natively supports the uwsgi protocol we use `uwsgi_pass` instead of the traditional `proxy_pass`.
-
-nginx + gunicorn \^\^\^\^\^\^\^\^\^\^\^\^\^ You can use gunicorn instead of uwsgi if you prefer, the process doesn't 
-differ too much. As we can't use `uwsgi_pass` with gunicorn, the nginx configuration file is going to differ a bit:
-
-``` {.sourceCode .nginx}
-server {
-    listen      80;
-    server_name puppetboard.example.tld;
-    charset     utf-8;
-
-    location /static {
-        alias /usr/local/lib/pythonX.Y/dist-packages/puppetboard/static;
-    }
-
-    location / {
-        add_header Access-Control-Allow-Origin *;
-        proxy_pass_header Server;
-        proxy_set_header Host $http_host;
-        proxy_redirect off;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Scheme $scheme;
-        proxy_connect_timeout 10;
-        proxy_read_timeout 10;
-        proxy_pass http://127.0.0.1:9090;
-    }
-}
-```
-
-Now, for running it with gunicorn:
-
-``` {.sourceCode .bash}
-$ cd /usr/local/lib/pythonX.Y/dist-packages/puppetboard
-$ gunicorn -b 127.0.0.1:9090 puppetboard.app:app
-```
-
-As we may want to serve in the background, and we need `PUPPETBOARD_SETTINGS` as an environment variable,
-is recommendable to run this under supervisor. An example supervisor config with basic settings is the following:
-
-``` {.sourceCode .ini}
-[program:puppetboard]
-command=gunicorn -b 127.0.0.1:9090 puppetboard.app:app
-user=www-data
-stdout_logfile=/var/log/supervisor/puppetboard/puppetboard.out
-stderr_logfile=/var/log/supervisor/puppetboard/puppetboard.err
-environment=PUPPETBOARD_SETTINGS="/var/www/puppetboard/settings.py"
-```
-
-For newer systems with systemd (for example CentOS7), you can use the following service file (`/usr/lib/systemd/system/gunicorn@.service`):
-
-``` {.sourceCode .ini}
-[Unit]
-Description=gunicorn daemon for %i
-After=network.target
-
-[Service]
-ExecStart=/usr/bin/gunicorn --config /etc/sysconfig/gunicorn/%i.conf %i
-ExecReload=/bin/kill -s HUP $MAINPID
-PrivateTmp=true
-User=gunicorn
-Group=gunicorn
-```
-
-And the corresponding gunicorn config (`/etc/sysconfig/gunicorn/puppetboard.app\:app.conf`):
-
-``` {.sourceCode .ini}
-import multiprocessing
-
-bind    = '127.0.0.1:9090'
-workers = multiprocessing.cpu_count() * 2 + 1
-chdir   = '/usr/lib/pythonX.Y/site-packages/puppetboard'
-raw_env = ['PUPPETBOARD_SETTINGS=/var/www/puppetboard/settings.py', 'http_proxy=']
-```
-
-## nginx + gunicorn ASGI worker (JSON API and MCP server)
-
-The MCP server on `/mcp` needs the ASGI entry point; it serves the web
-interface and the JSON API as well. Install the extra dependencies and run it
-with gunicorn's built-in ASGI worker:
+## Container image
 
 ```bash
-$ pip install -r requirements-docker.txt .
-$ gunicorn -k asgi -b 127.0.0.1:9090 puppetboard.asgi:app
+docker run -d --name puppetboard --restart unless-stopped \
+  -p 127.0.0.1:8080:8080 \
+  -e PUPPETDB_HOST=puppetdb.example.com -e PUPPETDB_PORT=8081 \
+  -e PUPPETDB_SSL_VERIFY=/etc/puppetboard/ca.pem \
+  -e PUPPETDB_KEY=/etc/puppetboard/key.pem -e PUPPETDB_CERT=/etc/puppetboard/cert.pem \
+  -e SECRET_KEY=change-me-to-a-long-random-string \
+  -e ENABLE_API=true -e ENABLE_MCP=true -e MCP_ALLOWED_HOSTS=puppetboard.example.com \
+  -v /etc/puppetboard:/etc/puppetboard:ro \
+  ghcr.io/dennispohlmann/puppetboard
 ```
 
-In the settings enable the features and name the host the clients use:
+The image runs as user `puppetboard` (uid 10001) on port 8080; the key and
+certificate files must be readable for that user. All settings are
+environment variables with the names from the [README](../README.md#app-settings).
+The same command works with rootless Podman.
+
+## Python package with gunicorn and systemd
+
+Python 3.12 or newer, e.g. the system Python of RHEL 10:
+
+```bash
+python3 -m venv /opt/puppetboard
+/opt/puppetboard/bin/pip install 'puppetboard-dp[mcp]'
+useradd --system --home-dir /opt/puppetboard --shell /sbin/nologin puppetboard
+```
+
+`/etc/puppetboard/settings.py` overrides only what differs from
+[default_settings.py](../puppetboard/default_settings.py):
 
 ```python
+PUPPETDB_HOST = 'puppetdb.example.com'
+PUPPETDB_PORT = 8081
+PUPPETDB_SSL_VERIFY = '/etc/puppetlabs/puppet/ssl/certs/ca.pem'
+PUPPETDB_KEY = '/etc/puppetboard/key.pem'
+PUPPETDB_CERT = '/etc/puppetboard/cert.pem'
+SECRET_KEY = 'change-me-to-a-long-random-string'
 ENABLE_API = True
 ENABLE_MCP = True
 MCP_ALLOWED_HOSTS = ['puppetboard.example.com']
 ```
 
-Neither the API nor the MCP server authenticates clients, so put TLS and
-authentication in front of them, see below and [docs/API.md](API.md). With
-a URL prefix use `--root-path /puppetboard`. On RHEL 10 the system Python 3.12
-is enough.
+`/etc/systemd/system/puppetboard.service`:
 
-# Security
+```ini
+[Unit]
+Description=Puppetboard
+After=network-online.target
+Wants=network-online.target
 
-If you wish to make users authenticate before getting access to Puppetboard you can use one of the following configuration snippets.
+[Service]
+User=puppetboard
+Environment=PUPPETBOARD_SETTINGS=/etc/puppetboard/settings.py
+ExecStart=/opt/puppetboard/bin/gunicorn -k asgi --workers 2 -b 127.0.0.1:8080 puppetboard.asgi:app
+Restart=on-failure
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
 
-## Apache
-
-Inside the `VirtualHost`:
-
-``` {.sourceCode .apache}
-<Location "/">
-    AuthType Basic
-    AuthName "Puppetboard"
-    Require valid-user
-    AuthBasicProvider file
-    AuthUserFile /path/to/a/file.htpasswd
-</Location>
+[Install]
+WantedBy=multi-user.target
 ```
+
+```bash
+systemctl daemon-reload
+systemctl enable --now puppetboard
+```
+
+`puppetboard.asgi:app` serves the web interface, the JSON API and the MCP
+server. If you need neither MCP nor ASGI, the WSGI app `puppetboard.app:app`
+runs with any WSGI server, e.g. `gunicorn puppetboard.app:app`.
+
+Under a URL prefix such as `https://example.com/puppetboard/`, add
+`--root-path /puppetboard` to gunicorn (container: `PUPPETBOARD_URL_PREFIX`).
 
 ## nginx
 
-Inside the `location / {}` block that has the `uwsgi_pass` or `proxy_pass` directive:
+TLS and Basic-Auth for everything. Puppetboard trusts the `X-Forwarded-*`
+headers of exactly one proxy, so put it directly behind this one.
 
-``` {.sourceCode .nginx}
-auth_basic "Puppetboard";
-auth_basic_user_file /path/to/a/file.htpasswd;
+```nginx
+server {
+    listen 443 ssl;
+    server_name puppetboard.example.com;
+    ssl_certificate     /etc/pki/tls/certs/puppetboard.crt;
+    ssl_certificate_key /etc/pki/tls/private/puppetboard.key;
+
+    auth_basic           "Puppetboard";
+    auth_basic_user_file /etc/nginx/puppetboard.htpasswd;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_read_timeout 60s;
+    }
+}
 ```
+
+## Apache
+
+```apache
+<VirtualHost *:443>
+    ServerName puppetboard.example.com
+    SSLEngine on
+    SSLCertificateFile    /etc/pki/tls/certs/puppetboard.crt
+    SSLCertificateKeyFile /etc/pki/tls/private/puppetboard.key
+
+    <Location "/">
+        AuthType Basic
+        AuthName "Puppetboard"
+        AuthBasicProvider file
+        AuthUserFile /etc/httpd/puppetboard.htpasswd
+        Require valid-user
+    </Location>
+
+    ProxyPreserveHost On
+    RequestHeader set X-Forwarded-Proto "https"
+    ProxyPass        / http://127.0.0.1:8080/
+    ProxyPassReverse / http://127.0.0.1:8080/
+</VirtualHost>
+```
+
+On RHEL with SELinux, allow the web server to connect to the local port:
+`setsebool -P httpd_can_network_connect 1`.
