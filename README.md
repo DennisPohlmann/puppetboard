@@ -1,9 +1,7 @@
 # Puppetboard
 
-[![PyPI Version](https://img.shields.io/pypi/v/puppetboard)](https://pypi.org/project/puppetboard/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/puppetboard)](https://pypi.org/project/puppetboard/)
-![Tests Status](https://github.com/voxpupuli/puppetboard/workflows/tests%20(unit)/badge.svg)
-[![codecov](https://codecov.io/gh/voxpupuli/puppetboard/branch/master/graph/badge.svg?token=uez5RoiU6I)](https://codecov.io/gh/voxpupuli/puppetboard)
+[![PyPI Version](https://img.shields.io/pypi/v/puppetboard-dp)](https://pypi.org/project/puppetboard-dp/)
+![Tests Status](https://github.com/DennisPohlmann/puppetboard/actions/workflows/tests.yml/badge.svg)
 [![By Voxpupuli](https://img.shields.io/badge/by-Vox%20Pupuli%20%F0%9F%A6%8A-ef902f.svg)](http://voxpupuli.org)
 
 
@@ -200,8 +198,11 @@ We recommend using virtualenv to provide a separate environment for the app.
 ```bash
 virtualenv -p python3 venv
 . venv/bin/activate
-pip install puppetboard
+pip install puppetboard-dp
 ```
+
+This fork is published on PyPI as `puppetboard-dp` (the package to import and run is still `puppetboard`);
+the upstream project is `puppetboard`.
 
 Please see [an article about more deployment setups here](https://github.com/voxpupuli/puppetboard/blob/master/docs/Deployment-setups.md).
 

@@ -58,3 +58,9 @@ def test_get_friendly_error_certname_is_literal():
     message = "Error: failed on node fooXbar.com"
     assert get_friendly_error("Puppet", message, "foo.bar.com") == message
     assert get_friendly_error("Puppet", "Error: x on node a(b", "a(b") == "Error: x"
+
+
+def test_version_from_fork_distribution():
+    import importlib.metadata
+    from puppetboard.version import __version__
+    assert __version__ == importlib.metadata.version('puppetboard-dp')

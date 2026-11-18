@@ -39,12 +39,12 @@ class PyTest(TestCommand):
 
 
 setup(
-    name='puppetboard',
+    name='puppetboard-dp',
     version=__version__,
     author='Vox Pupuli',
     author_email='voxpupuli@groups.io',
     packages=["puppetboard", "puppetboard.views"],
-    url='https://github.com/voxpupuli/puppetboard',
+    url='https://github.com/DennisPohlmann/puppetboard',
     license='Apache License 2.0',
     description='Web frontend for PuppetDB',
     include_package_data=True,

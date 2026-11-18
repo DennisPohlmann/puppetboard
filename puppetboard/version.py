@@ -3,4 +3,4 @@
 #
 
 import importlib.metadata
-__version__ = importlib.metadata.version('puppetboard')
+__version__ = importlib.metadata.version('puppetboard-dp')  # distribution name of this fork on PyPI
