@@ -100,3 +100,10 @@ def test_metric_long_name_is_escaped(client, mocker, mock_puppetdb_environments)
     body = client.get('/metric/' + name).get_data(as_text=True)
     assert '<script>alert(1)' not in body
     assert '&lt;script&gt;' in body
+
+
+def test_fact_value_string_is_escaped_once(client, mocker, mock_puppetdb_environments):
+    mocker.patch.object(app.puppetdb, 'facts', return_value=[])
+    body = client.get('/fact/kernel/x%27y%26z%5C').get_data(as_text=True)
+    # a JS string literal from tojson: pretty_print escapes it once, a backslash cannot end it
+    assert 'pretty_print("x\\u0027y\\u0026z\\\\")' in body
