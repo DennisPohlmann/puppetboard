@@ -14,6 +14,14 @@ UNRESPONSIVE_HOURS = 2
 ENABLE_QUERY = True
 # Uncomment to restrict the enabled PuppetDB endpoints in the query page.
 # ENABLED_QUERY_ENDPOINTS = ['facts', 'nodes']
+# Read-only JSON API under /api/v1/ (docs/API.md). It has no authentication
+# of its own, put it behind a reverse proxy with TLS and authentication.
+ENABLE_API = False
+API_DEFAULT_LIMIT = 100
+API_MAX_LIMIT = 1000
+API_MAX_QUERY_LENGTH = 4096
+# Requests per minute and client IP for /api/ and /mcp, 0 disables the limit
+API_RATE_LIMIT = 120
 # Path to YAML file containing preset queries (None to disable)
 QUERY_PRESETS_FILE = None  # Example: '/etc/puppetboard/query_presets.yaml'
 LOCALISE_TIMESTAMP = True

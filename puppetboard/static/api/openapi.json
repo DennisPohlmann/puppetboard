@@ -1,0 +1,668 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "Puppetboard API",
+  "version": "1.0.0",
+  "description": "Read-only JSON API over PuppetDB data. No authentication of its own: run it behind a TLS reverse proxy that authenticates clients. Enabled with ENABLE_API. Requests per client are limited by API_RATE_LIMIT per minute."
+ },
+ "servers": [
+  {
+   "url": "/api/v1"
+  }
+ ],
+ "paths": {
+  "/nodes": {
+   "get": {
+    "summary": "List active nodes",
+    "parameters": [
+     {
+      "name": "status",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "enum": [
+        "failed",
+        "changed",
+        "unchanged",
+        "noop",
+        "unreported"
+       ]
+      }
+     },
+     {
+      "name": "environment",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "pattern": "^[A-Za-z0-9_]+$"
+      },
+      "description": "Puppet environment, omit or * for all"
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 1000,
+       "default": 100
+      },
+      "description": "Page size (API_MAX_LIMIT caps it)"
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Nodes as returned by PuppetDB",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "data": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/Node"
+           }
+          },
+          "meta": {
+           "$ref": "#/components/schemas/Meta"
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Error"
+     },
+     "404": {
+      "$ref": "#/components/responses/Error"
+     },
+     "429": {
+      "$ref": "#/components/responses/Error"
+     },
+     "502": {
+      "$ref": "#/components/responses/Error"
+     }
+    }
+   }
+  },
+  "/nodes/{certname}": {
+   "get": {
+    "summary": "One node",
+    "parameters": [
+     {
+      "name": "certname",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,252}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "The node",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "data": {
+           "$ref": "#/components/schemas/Node"
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Error"
+     },
+     "404": {
+      "$ref": "#/components/responses/Error"
+     },
+     "429": {
+      "$ref": "#/components/responses/Error"
+     },
+     "502": {
+      "$ref": "#/components/responses/Error"
+     }
+    }
+   }
+  },
+  "/nodes/{certname}/facts": {
+   "get": {
+    "summary": "Facts of a node as name to value map",
+    "parameters": [
+     {
+      "name": "certname",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,252}$"
+      }
+     },
+     {
+      "name": "name",
+      "in": "query",
+      "schema": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "style": "form",
+      "explode": true,
+      "description": "Only these facts (repeatable)"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Facts",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "data": {
+           "type": "object",
+           "additionalProperties": true
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Error"
+     },
+     "404": {
+      "$ref": "#/components/responses/Error"
+     },
+     "429": {
+      "$ref": "#/components/responses/Error"
+     },
+     "502": {
+      "$ref": "#/components/responses/Error"
+     }
+    }
+   }
+  },
+  "/nodes/{certname}/reports": {
+   "get": {
+    "summary": "Reports of a node, newest first, without logs and events",
+    "parameters": [
+     {
+      "name": "certname",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,252}$"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 1000,
+       "default": 100
+      },
+      "description": "Page size (API_MAX_LIMIT caps it)"
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Report summaries",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "data": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/ReportSummary"
+           }
+          },
+          "meta": {
+           "$ref": "#/components/schemas/Meta"
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Error"
+     },
+     "404": {
+      "$ref": "#/components/responses/Error"
+     },
+     "429": {
+      "$ref": "#/components/responses/Error"
+     },
+     "502": {
+      "$ref": "#/components/responses/Error"
+     }
+    }
+   }
+  },
+  "/nodes/{certname}/resources": {
+   "get": {
+    "summary": "Catalog resources of a node",
+    "parameters": [
+     {
+      "name": "certname",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,252}$"
+      }
+     },
+     {
+      "name": "type",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "Resource type, e.g. package or file (case-insensitive)"
+     },
+     {
+      "name": "title",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 1000,
+       "default": 100
+      },
+      "description": "Page size (API_MAX_LIMIT caps it)"
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Resources",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "data": {
+           "type": "array",
+           "items": {
+            "type": "object",
+            "additionalProperties": true
+           }
+          },
+          "meta": {
+           "$ref": "#/components/schemas/Meta"
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Error"
+     },
+     "404": {
+      "$ref": "#/components/responses/Error"
+     },
+     "429": {
+      "$ref": "#/components/responses/Error"
+     },
+     "502": {
+      "$ref": "#/components/responses/Error"
+     }
+    }
+   }
+  },
+  "/facts/{name}": {
+   "get": {
+    "summary": "Value of one top-level fact on every node",
+    "parameters": [
+     {
+      "name": "name",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "environment",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "pattern": "^[A-Za-z0-9_]+$"
+      },
+      "description": "Puppet environment, omit or * for all"
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 1000,
+       "default": 100
+      },
+      "description": "Page size (API_MAX_LIMIT caps it)"
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Fact values",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "data": {
+           "type": "array",
+           "items": {
+            "type": "object",
+            "properties": {
+             "certname": {
+              "type": "string"
+             },
+             "environment": {
+              "type": "string"
+             },
+             "value": {}
+            }
+           }
+          },
+          "meta": {
+           "$ref": "#/components/schemas/Meta"
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Error"
+     },
+     "404": {
+      "$ref": "#/components/responses/Error"
+     },
+     "429": {
+      "$ref": "#/components/responses/Error"
+     },
+     "502": {
+      "$ref": "#/components/responses/Error"
+     }
+    }
+   }
+  },
+  "/reports/{hash}": {
+   "get": {
+    "summary": "One report with logs, metrics and resource events",
+    "parameters": [
+     {
+      "name": "hash",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "pattern": "^[0-9a-f]{40}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "The report",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "data": {
+           "type": "object",
+           "additionalProperties": true
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Error"
+     },
+     "404": {
+      "$ref": "#/components/responses/Error"
+     },
+     "429": {
+      "$ref": "#/components/responses/Error"
+     },
+     "502": {
+      "$ref": "#/components/responses/Error"
+     }
+    }
+   }
+  },
+  "/query": {
+   "get": {
+    "summary": "Run a PQL query (only when ENABLE_QUERY is set)",
+    "parameters": [
+     {
+      "name": "pql",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "maxLength": 4096
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Rows, at most API_MAX_LIMIT",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "data": {
+           "type": "array",
+           "items": {
+            "type": "object",
+            "additionalProperties": true
+           }
+          },
+          "meta": {
+           "type": "object",
+           "properties": {
+            "count": {
+             "type": "integer"
+            },
+            "truncated": {
+             "type": "boolean"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Error"
+     },
+     "404": {
+      "$ref": "#/components/responses/Error"
+     },
+     "429": {
+      "$ref": "#/components/responses/Error"
+     },
+     "502": {
+      "$ref": "#/components/responses/Error"
+     },
+     "403": {
+      "$ref": "#/components/responses/Error"
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "Meta": {
+    "type": "object",
+    "properties": {
+     "limit": {
+      "type": "integer"
+     },
+     "offset": {
+      "type": "integer"
+     },
+     "count": {
+      "type": "integer",
+      "description": "Rows in this page; less than limit means last page"
+     }
+    }
+   },
+   "Node": {
+    "type": "object",
+    "description": "PuppetDB node object",
+    "properties": {
+     "certname": {
+      "type": "string"
+     },
+     "catalog_environment": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "report_timestamp": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "format": "date-time"
+     },
+     "latest_report_status": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "latest_report_noop": {
+      "type": [
+       "boolean",
+       "null"
+      ]
+     },
+     "latest_report_hash": {
+      "type": [
+       "string",
+       "null"
+      ]
+     }
+    },
+    "additionalProperties": true
+   },
+   "ReportSummary": {
+    "type": "object",
+    "properties": {
+     "hash": {},
+     "certname": {},
+     "environment": {},
+     "status": {},
+     "noop": {},
+     "noop_pending": {},
+     "corrective_change": {},
+     "start_time": {},
+     "end_time": {},
+     "receive_time": {},
+     "producer_timestamp": {},
+     "puppet_version": {},
+     "configuration_version": {},
+     "transaction_uuid": {},
+     "cached_catalog_status": {},
+     "type": {}
+    }
+   },
+   "Error": {
+    "type": "object",
+    "properties": {
+     "error": {
+      "type": "object",
+      "properties": {
+       "status": {
+        "type": "integer"
+       },
+       "message": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   }
+  },
+  "responses": {
+   "Error": {
+    "description": "Error",
+    "content": {
+     "application/json": {
+      "schema": {
+       "$ref": "#/components/schemas/Error"
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -33,6 +33,8 @@ import puppetboard.views.radiator  # noqa: F401
 import puppetboard.views.reports  # noqa: F401
 # noinspection PyUnresolvedReferences
 import puppetboard.views.failures  # noqa: F401
+# noinspection PyUnresolvedReferences
+import puppetboard.views.api  # noqa: F401
 import puppetboard.errors  # noqa: F401
 
 from puppetboard.core import get_app, get_puppetdb, get_scheduler

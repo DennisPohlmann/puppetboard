@@ -67,6 +67,11 @@ UNRESPONSIVE_HOURS = int(os.getenv('UNRESPONSIVE_HOURS', '2'))
 ENABLE_QUERY = coerce_bool(os.getenv('ENABLE_QUERY'), True)
 # Uncomment to restrict the enabled PuppetDB endpoints in the query page.
 # ENABLED_QUERY_ENDPOINTS = ['facts', 'nodes']
+ENABLE_API = coerce_bool(os.getenv('ENABLE_API'), False)
+API_DEFAULT_LIMIT = int(os.getenv('API_DEFAULT_LIMIT', '100'))
+API_MAX_LIMIT = int(os.getenv('API_MAX_LIMIT', '1000'))
+API_MAX_QUERY_LENGTH = int(os.getenv('API_MAX_QUERY_LENGTH', '4096'))
+API_RATE_LIMIT = int(os.getenv('API_RATE_LIMIT', '120'))
 
 LOCALISE_TIMESTAMP = coerce_bool(os.getenv('LOCALISE_TIMESTAMP'), True)
 LOGLEVEL = os.getenv('LOGLEVEL', 'info')

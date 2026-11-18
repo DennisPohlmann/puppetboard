@@ -1,7 +1,8 @@
-from flask import render_template
+from flask import render_template, request
 from werkzeug.exceptions import InternalServerError
 
 from puppetboard.core import environments, get_app
+from puppetboard.views.api import error
 
 app = get_app()
 
@@ -20,8 +21,17 @@ def forbidden(e):
 
 @app.errorhandler(404)
 def not_found(e):
+    if request.path.startswith('/api/'):
+        return error(404, 'not found')
     envs = environments()
     return render_template('404.html', envs=envs), 404
+
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    if request.path.startswith('/api/'):
+        return error(405, 'the API is read-only, use GET')
+    return e
 
 
 @app.errorhandler(412)
