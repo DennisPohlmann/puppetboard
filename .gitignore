@@ -53,3 +53,9 @@ venv
 Gemfile.lock
 .bundle
 .vendor
+
+# Taken over from the Vanishly repository
+.env
+.env.local
+.claude/
+CLAUDE.md
