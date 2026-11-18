@@ -63,6 +63,8 @@ types-toml = "^0.10.8.20240310"
 
 [tool.poetry.group.docker.dependencies]
 gunicorn = ">=23,<28"
+mcp = "^2.3.0"
+a2wsgi = "^1.10.10"
 
 [build-system]
 requires = ["poetry-core"]

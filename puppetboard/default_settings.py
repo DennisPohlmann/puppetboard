@@ -22,6 +22,16 @@ API_MAX_LIMIT = 1000
 API_MAX_QUERY_LENGTH = 4096
 # Requests per minute and client IP for /api/ and /mcp, 0 disables the limit
 API_RATE_LIMIT = 120
+# Read-only MCP server on /mcp, only when served by puppetboard.asgi:app.
+# Like the API it has no authentication of its own.
+ENABLE_MCP = False
+# Host headers accepted on /mcp (DNS rebinding protection), e.g.
+# ['puppetboard.example.com']; empty refuses every request
+MCP_ALLOWED_HOSTS: list[str] = []
+# Origin headers accepted on /mcp, e.g. ['https://puppetboard.example.com']
+MCP_ALLOWED_ORIGINS: list[str] = []
+MCP_MAX_REQUEST_BODY = 65536
+MCP_PROTOCOL_VERSIONS = ['2025-06-18', '2025-11-25', '2026-07-28']
 # Path to YAML file containing preset queries (None to disable)
 QUERY_PRESETS_FILE = None  # Example: '/etc/puppetboard/query_presets.yaml'
 LOCALISE_TIMESTAMP = True

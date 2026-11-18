@@ -72,6 +72,13 @@ API_DEFAULT_LIMIT = int(os.getenv('API_DEFAULT_LIMIT', '100'))
 API_MAX_LIMIT = int(os.getenv('API_MAX_LIMIT', '1000'))
 API_MAX_QUERY_LENGTH = int(os.getenv('API_MAX_QUERY_LENGTH', '4096'))
 API_RATE_LIMIT = int(os.getenv('API_RATE_LIMIT', '120'))
+ENABLE_MCP = coerce_bool(os.getenv('ENABLE_MCP'), False)
+MCP_ALLOWED_HOSTS = [x.strip() for x in os.getenv('MCP_ALLOWED_HOSTS', '').split(',') if x.strip()]
+MCP_ALLOWED_ORIGINS = [x.strip() for x in os.getenv('MCP_ALLOWED_ORIGINS', '').split(',')
+                       if x.strip()]
+MCP_MAX_REQUEST_BODY = int(os.getenv('MCP_MAX_REQUEST_BODY', '65536'))
+MCP_PROTOCOL_VERSIONS = [x.strip() for x in os.getenv(
+    'MCP_PROTOCOL_VERSIONS', '2025-06-18,2025-11-25,2026-07-28').split(',') if x.strip()]
 
 LOCALISE_TIMESTAMP = coerce_bool(os.getenv('LOCALISE_TIMESTAMP'), True)
 LOGLEVEL = os.getenv('LOGLEVEL', 'info')
