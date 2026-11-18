@@ -161,9 +161,10 @@ def create_server(config):
 
 def forwarded_client(scope):
     """Client address, trusting one proxy hop like the Flask app's ProxyFix."""
-    for name, value in scope.get('headers', []):
-        if name == b'x-forwarded-for':
-            return value.decode('latin-1').split(',')[-1].strip()
+    # several header lines count as one comma list, so the proxy's appended line wins
+    hops = [v.decode('latin-1') for n, v in scope.get('headers', []) if n == b'x-forwarded-for']
+    if hops:
+        return ','.join(hops).split(',')[-1].strip()
     return (scope.get('client') or ('-',))[0]
 
 

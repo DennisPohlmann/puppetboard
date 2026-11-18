@@ -155,3 +155,12 @@ def test_tool_call_and_audit_log(endpoint, caplog, pdb_query):
     assert entry['calls'] == [{'id': 7, 'rpc': 'tools/call', 'tool': 'list_environments'}]
     assert entry['client'] == '10.0.0.1'
     assert entry['status'] == status
+
+
+def test_forwarded_client_uses_last_hop_over_all_header_lines():
+    from puppetboard.mcp_server import forwarded_client
+    # a client-sent line comes first, the proxy appends its own line last
+    scope = {'client': ('10.0.0.1', 1), 'headers': [(b'x-forwarded-for', b'1.1.1.1, 2.2.2.2'),
+                                                    (b'x-forwarded-for', b'203.0.113.7')]}
+    assert forwarded_client(scope) == '203.0.113.7'
+    assert forwarded_client({'client': ('10.0.0.1', 1), 'headers': []}) == '10.0.0.1'
