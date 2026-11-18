@@ -18,10 +18,10 @@ see [Securing API and MCP](#securing-api-and-mcp).
 |---|---|---|---|
 | `ENABLE_API` | `ENABLE_API` | `False` | Serve `/api/v1/`. When off every API URL answers 404. |
 | `API_DEFAULT_LIMIT` | `API_DEFAULT_LIMIT` | `100` | Page size when `limit` is not given. |
-| `API_MAX_LIMIT` | `API_MAX_LIMIT` | `1000` | Largest allowed `limit`, also caps PQL results. |
+| `API_MAX_LIMIT` | `API_MAX_LIMIT` | `1000` | Largest allowed `limit`, also caps PQL results (after PuppetDB returned them, so a broad query still costs worker memory). |
 | `API_MAX_QUERY_LENGTH` | `API_MAX_QUERY_LENGTH` | `4096` | Longest accepted PQL query. |
 | `API_RATE_LIMIT` | `API_RATE_LIMIT` | `120` | Requests per minute and client IP (API and MCP), `0` turns it off. Counted per worker process. |
-| `ENABLE_QUERY` | `ENABLE_QUERY` | `True` | Also gates `/api/v1/query` (and `ENABLED_QUERY_ENDPOINTS` must contain `pql`). |
+| `ENABLE_QUERY` | `ENABLE_QUERY` | `True` | Also gates `/api/v1/query` (and `ENABLED_QUERY_ENDPOINTS` must contain `pql`). PQL reads every PuppetDB entity, catalogs and resource parameters included, regardless of `ENABLE_CATALOG`. |
 | `ENABLE_CATALOG` | `ENABLE_CATALOG` | `False` | Also gates `/api/v1/nodes/<certname>/resources`; resource parameters can hold secrets. |
 
 ### Endpoints

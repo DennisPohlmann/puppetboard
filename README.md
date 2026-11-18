@@ -230,7 +230,9 @@ Other settings that might be interesting, in no particular order:
     `'critical'` for less verbose logging or `'debug'` for more information.
 - `ENABLE_QUERY`: Defaults to `True` causing a Query tab to show up in the web interface allowing users to write
     and execute arbitrary queries against a set of endpoints in PuppetDB. Change this to `False` to disable this.
-    See `ENABLED_QUERY_ENDPOINTS` to fine-tune which endpoints are allowed.
+    See `ENABLED_QUERY_ENDPOINTS` to fine-tune which endpoints are allowed. PQL (Query tab, `/api/v1/query`,
+    MCP `run_pql`) can read every PuppetDB entity, catalogs and resource parameters included, also when
+    `ENABLE_CATALOG` is `False`. Turn the query off if your catalogs hold secrets.
 - `ENABLED_QUERY_ENDPOINTS`: If `ENABLE_QUERY` is `True`, allow to fine tune the endpoints of PuppetDB APIs that
     can be queried. It must be a list of strings of PuppetDB endpoints for which the query is enabled.
     See the `QUERY_ENDPOINTS` constant in the `puppetboard.forms` module for a list of the available endpoints.
