@@ -6,6 +6,7 @@ that terminates TLS and authenticates the client.
 import logging
 import os
 import time
+from datetime import datetime, timezone
 
 from flask import Blueprint, abort, g, jsonify, request, send_from_directory
 from requests.exceptions import ConnectionError, HTTPError, Timeout
@@ -49,8 +50,8 @@ def headers_and_audit(response):
     response.headers['Cache-Control'] = 'no-store'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     if 'api_start' in g:
-        audit.info('api method=%s path=%r status=%s client=%s duration_ms=%d',
-                   request.method, request.full_path, response.status_code,
+        audit.info('api ts=%s method=%s path=%r status=%s client=%s duration_ms=%d',
+                   datetime.now(timezone.utc).isoformat(), request.method, request.full_path, response.status_code,
                    request.remote_addr, (time.monotonic() - g.api_start) * 1000)
     return response
 
