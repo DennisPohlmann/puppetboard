@@ -262,11 +262,14 @@ def check_jsonrpc(body, entry):
         if not isinstance(msg, dict):
             return 400, 'invalid JSON-RPC message'
         method = msg.get('method')
+        params = msg.get('params') or {}
+        if not isinstance(params, dict):
+            return 400, 'JSON-RPC params must be an object'
         if method == 'initialize':
-            entry['protocol'] = (msg.get('params') or {}).get('protocolVersion')
+            entry['protocol'] = params.get('protocolVersion')
         entry.setdefault('calls', []).append({
             'rpc': method, 'id': msg.get('id'),
-            'tool': (msg.get('params') or {}).get('name') if method == 'tools/call' else None})
+            'tool': params.get('name') if method == 'tools/call' else None})
         if isinstance(method, str) and not method.startswith('notifications/') \
                 and msg.get('id') is None:
             return 400, 'JSON-RPC requests need a non-null id'

@@ -125,6 +125,13 @@ def test_request_without_id_refused(endpoint):
     assert status == 400 and b'non-null id' in body
 
 
+def test_non_object_params_refused(endpoint):
+    results = asgi(endpoint,
+                   request(body=b'{"jsonrpc":"2.0","id":1,"method":"tools/call","params":[1]}'),
+                   request(body=b'{"jsonrpc":"2.0","id":2,"method":"initialize","params":"x"}'))
+    assert all(status == 400 and b'params must be an object' in body for status, body in results)
+
+
 def test_body_size_limit(endpoint):
     assert asgi(endpoint, request(body=b'x' * 2000))[0][0] == 413
 
