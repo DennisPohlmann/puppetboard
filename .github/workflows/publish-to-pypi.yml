@@ -9,6 +9,9 @@ jobs:
   build-n-publish:
 
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # create the GitHub release
+      id-token: write   # PyPI Trusted Publishing (OIDC), no API token
 
     steps:
       - uses: actions/checkout@v7
@@ -25,9 +28,6 @@ jobs:
           poetry build
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@v1.14.3
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN_PUPPETBOARD }}
-          # repository_url: https://test.pypi.org/legacy/
       - name: Create release in GitHub
         id: create_release
         uses: actions/create-release@v1
