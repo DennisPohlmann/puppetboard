@@ -42,9 +42,9 @@ To see how to get it working with RedHat/Centos 7 check out these [docs](https:/
 
 ### Using Docker
 
-We provide an official Docker image in:
-* [GitHub Container Registry](https://github.com/orgs/voxpupuli/packages/container/package/puppetboard),
-* [Dockerhub](https://hub.docker.com/r/voxpupuli/puppetboard).
+The container image of this fork is published in the
+[GitHub Container Registry](https://github.com/DennisPohlmann/puppetboard/pkgs/container/puppetboard)
+as `ghcr.io/dennispohlmann/puppetboard`.
 
 You can run the app on your PuppetDB host with this command:
 
@@ -55,7 +55,7 @@ docker run -it \
   -e PUPPETBOARD_PORT=8088 \
   -e SECRET_KEY=XXXXXXXX \
   --net=host \
-  ghcr.io/voxpupuli/puppetboard
+  ghcr.io/dennispohlmann/puppetboard
 ```
 With `--net=host` next to PuppetDB, `PUPPETBOARD_PORT` must differ from PuppetDB's port 8080.
 Note: you must provide a secret key! Generate one for example by running `ruby -e "require 'securerandom'; puts SecureRandom.hex(32)"`.
@@ -74,10 +74,10 @@ You can use the following Puppet Code to have Puppetboard managed by Puppet:
 ```puppet
 include docker
 
-docker::image { 'ghcr.io/voxpupuli/puppetboard': }
+docker::image { 'ghcr.io/dennispohlmann/puppetboard': }
 
 docker::run { 'puppetboard':
-  image => 'ghcr.io/voxpupuli/puppetboard',
+  image => 'ghcr.io/dennispohlmann/puppetboard',
   env   => [
     'PUPPETDB_HOST=127.0.0.1',
     'PUPPETDB_PORT=8080',
@@ -107,10 +107,10 @@ file { '/etc/puppetboard/cert.pem':
 
 include docker
 
-docker::image { 'ghcr.io/voxpupuli/puppetboard': }
+docker::image { 'ghcr.io/dennispohlmann/puppetboard': }
 
 docker::run { 'puppetboard':
-  image   => 'ghcr.io/voxpupuli/puppetboard',
+  image   => 'ghcr.io/dennispohlmann/puppetboard',
   volumes => ['/etc/puppetboard:/etc/puppetboard:ro'],
   env     => [
     'PUPPETDB_HOST=puppet', # this must be the certname or DNS_ALT_NAME of the PuppetDB host
@@ -175,7 +175,7 @@ The following is a list of OpenShift parameters that you can pass to the ``oc`` 
 - `PUPPETBOARD_PORT`: The TCP port on which the Puppetboard docker image presents the web interface (container default 8080).  This is not the
     user-facing web interface.  Rather, it's the port that the OpenShift route forwards **to**.  
 - `SERVICE_PORT`: The TCP port on which the Puppetboard service offers its user-facing web interface on OpenShift.  Defaults to '80'.
-- `PUPPETBOARD_SOURCE_REPOSITORY_URL`: The URL to the Puppetboard repository.  Defaults to 'https://github.com/voxpupuli/puppetboard.git'.
+- `PUPPETBOARD_SOURCE_REPOSITORY_URL`: The URL to the Puppetboard repository.  Defaults to 'https://github.com/DennisPohlmann/puppetboard.git'.
 - `PUPPETBOARD_SOURCE_REPOSITORY_REF`: The branch/tag/ref for Puppetboard.  Defaults to 'master'.
 
 ### From a package
