@@ -56,3 +56,9 @@ venv
 .env.local
 .claude/
 CLAUDE.md
+
+# docker-compose examples: local keys, certificates and passwords
+docker-compose/*/ssl/*.pem
+docker-compose/*/tls/*.pem
+docker-compose/*/htpasswd
+docker-compose/*/docker-compose.override.yml

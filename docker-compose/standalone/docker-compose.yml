@@ -1,0 +1,44 @@
+# Puppetboard for an existing PuppetDB.
+#
+#   cp .env.example .env     # required: all settings, then your values
+#   docker compose up -d     # or: podman-compose up -d
+#
+# Puppetboard listens on 127.0.0.1:8080; put a reverse proxy with TLS (and,
+# with ENABLE_API/ENABLE_MCP, authentication) in front, see ../proxy/.
+# The client certificate for PuppetDB goes to ./ssl/ (README.md).
+name: puppetboard
+
+# podman-compose: no pod and no extra infra container; Docker ignores this.
+x-podman:
+  in_pod: false
+
+services:
+  puppetboard:
+    image: ghcr.io/dennispohlmann/puppetboard:latest
+    # The image runs as the unprivileged user "puppetboard" (uid 10001).
+    # To build from a checkout instead:
+    #   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+    restart: unless-stopped
+    # Every setting is in .env next to this file (cp .env.example .env);
+    # the README of the repository explains each one.
+    env_file: .env
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      # ca.pem, cert.pem and key.pem for PuppetDB, readable for uid 10001.
+      - ./ssl:/etc/puppetboard/ssl:ro
+    # Same check as the Dockerfile's HEALTHCHECK, which images in OCI format
+    # do not carry (Podman then has no health check at all).
+    healthcheck:
+      test: ["CMD", "python", "-m", "puppetboard.healthcheck"]
+      interval: 1m
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/puppetboard
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true

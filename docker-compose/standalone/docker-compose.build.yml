@@ -1,0 +1,9 @@
+# Builds the Puppetboard image from the checkout instead of pulling it, in
+# docker-compose/standalone/ (works the same for the other examples):
+#
+#   cp .env.example .env
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+services:
+  puppetboard:
+    image: puppetboard:local
+    build: ../..

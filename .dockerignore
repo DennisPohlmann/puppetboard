@@ -15,3 +15,7 @@ venv
 docs
 screenshots
 test
+
+# compose examples may hold local keys and passwords
+docker-compose
+.env

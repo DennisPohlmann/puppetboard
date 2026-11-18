@@ -1,0 +1,54 @@
+# Puppetboard with JSON API and MCP server behind nginx with TLS and
+# Basic-Auth, for an existing PuppetDB.
+#
+#   cp .env.example .env                       # required, then your values
+#   htpasswd -cB htpasswd admin                # users for Basic-Auth
+#   cp /path/to/fullchain.pem tls/cert.pem     # server certificate for nginx
+#   cp /path/to/privkey.pem   tls/key.pem
+#   docker compose up -d                       # or: podman-compose up -d
+#
+# Only nginx is published (port 443); Puppetboard is reachable only through
+# it, because neither the API nor the MCP server authenticates on its own.
+name: puppetboard
+
+x-podman:
+  in_pod: false
+
+services:
+  puppetboard:
+    image: ghcr.io/dennispohlmann/puppetboard:latest
+    restart: unless-stopped
+    env_file: .env
+    # no ports: only nginx talks to it
+    expose: ["8080"]
+    volumes:
+      - ./ssl:/etc/puppetboard/ssl:ro
+    healthcheck:
+      test: ["CMD", "python", "-m", "puppetboard.healthcheck"]
+      interval: 1m
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/puppetboard
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+
+  nginx:
+    image: docker.io/library/nginx:stable-alpine
+    restart: unless-stopped
+    ports:
+      - "${HTTPS_PORT:-443}:8443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./htpasswd:/etc/nginx/htpasswd:ro
+      - ./tls:/etc/nginx/tls:ro
+    depends_on: [puppetboard]
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
