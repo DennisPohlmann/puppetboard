@@ -592,20 +592,6 @@ files = [
 test = ["flake8 (==3.9.2)", "hypothesis (==4.24.4)"]
 
 [[package]]
-name = "cov-core"
-version = "1.15.0"
-description = "plugin core for use by pytest-cov, nose-cov and nose2-cov"
-optional = false
-python-versions = "*"
-groups = ["test"]
-files = [
-    {file = "cov-core-1.15.0.tar.gz", hash = "sha256:4a14c67d520fda9d42b0da6134638578caae1d374b9bb462d8de00587dba764c"},
-]
-
-[package.dependencies]
-coverage = ">=3.6"
-
-[[package]]
 name = "coverage"
 version = "7.17.3"
 description = "Code coverage measurement for Python"
@@ -1587,23 +1573,6 @@ files = [
 ]
 
 [[package]]
-name = "mock"
-version = "5.2.0"
-description = "Rolling backport of unittest.mock for all Pythons"
-optional = false
-python-versions = ">=3.6"
-groups = ["test"]
-files = [
-    {file = "mock-5.2.0-py3-none-any.whl", hash = "sha256:7ba87f72ca0e915175596069dbbcc7c75af7b5e9b9bc107ad6349ede0819982f"},
-    {file = "mock-5.2.0.tar.gz", hash = "sha256:4e460e818629b4b173f32d08bf30d3af8123afbb8e04bb5707a1fd4799e503f0"},
-]
-
-[package.extras]
-build = ["blurb", "twine", "wheel"]
-docs = ["sphinx"]
-test = ["pytest", "pytest-cov"]
-
-[[package]]
 name = "mockey"
 version = "0.3.0"
 description = "A fixture that enforces correct mock.patch autospec behaviour, surfacing signature violations that the standard mock library silently ignores."
@@ -1752,18 +1721,6 @@ files = [
 hyperscan = ["hyperscan (>=0.7)"]
 optional = ["typing-extensions (>=4)"]
 re2 = ["google-re2 (>=1.1)"]
-
-[[package]]
-name = "pep8"
-version = "1.7.1"
-description = "Python style guide checker"
-optional = false
-python-versions = "*"
-groups = ["test"]
-files = [
-    {file = "pep8-1.7.1-py2.py3-none-any.whl", hash = "sha256:b22cfae5db09833bb9bd7c8463b53e1a9c9b39f12e304a8d0bba729c501827ee"},
-    {file = "pep8-1.7.1.tar.gz", hash = "sha256:fe249b52e20498e59e0b5c5256aa52ee99fc295b26ec9eaa85776ffdb9fe6374"},
-]
 
 [[package]]
 name = "platformdirs"
@@ -2618,30 +2575,6 @@ files = [
 urllib3 = ">=2"
 
 [[package]]
-name = "types-setuptools"
-version = "84.2.0.20261104"
-description = "Typing stubs for setuptools"
-optional = false
-python-versions = ">=3.10"
-groups = ["test"]
-files = [
-    {file = "types_setuptools-84.2.0.20261104-py3-none-any.whl", hash = "sha256:23e9bf876adca8df2285a68f76c355128b1e679b27cfec4854faf350cd7999e5"},
-    {file = "types_setuptools-84.2.0.20261104.tar.gz", hash = "sha256:1ec758bbeddf88d52f963fe663beabc2117b6aae73cf3d2902d7dd0df81bd76e"},
-]
-
-[[package]]
-name = "types-toml"
-version = "0.10.8.20260518"
-description = "Typing stubs for toml"
-optional = false
-python-versions = ">=3.10"
-groups = ["test"]
-files = [
-    {file = "types_toml-0.10.8.20260518-py3-none-any.whl", hash = "sha256:0e564ab05f6fde62a315b3b5a9b6624fda569399795d30a37e64705a70459303"},
-    {file = "types_toml-0.10.8.20260518.tar.gz", hash = "sha256:80e10facd24fdeda9d5c672187d72be3ac284843788d67f5aae59e3e016db6fe"},
-]
-
-[[package]]
 name = "typing-extensions"
 version = "4.16.0"
 description = "Backported and Experimental Type Hints for Python 3.9+"
@@ -2799,4 +2732,4 @@ mcp = []
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4"
-content-hash = "d9a91c68d7be9faba59958b3bef3ec8844b12c625afda5ad5db8bd44503ef018"
+content-hash = "13c9de039e139f5789067e85e7c5620dce1cdddc7a01d6a0fc5334b9a251d0be"

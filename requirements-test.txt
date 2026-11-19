@@ -1,7 +1,5 @@
 -r requirements-docker.txt
-pep8==1.7.1
 coverage==7.17.3
-mock==5.2.0
 mockey
 pytest==9.2.0
 pylint==4.1.4
@@ -10,10 +8,7 @@ pytest-cov==7.1.0
 pytest-mock==3.17.0
 pytest-mypy==1.1.0
 pytest-randomly==5.1.0
-cov-core==1.15.0
 beautifulsoup4==4.15.0
 bandit==1.9.4
 mypy==2.4.1
 types-requests==2.33.0.20261030
-types-setuptools==84.2.0.20261104
-types-toml==0.10.8.20260518
