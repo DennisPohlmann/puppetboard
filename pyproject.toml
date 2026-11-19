@@ -40,15 +40,15 @@ dependencies = [
     "typing-extensions>=4.12.2,<5",
     "wtforms>=3.3.0,<4",
     "zipp>=3.21,<5.0",
-]
-
-[project.optional-dependencies]
-# ASGI entry point puppetboard.asgi:app with the MCP server, as in the container
-mcp = [
+    # ASGI entry point puppetboard.asgi:app with the MCP server
     "gunicorn>=23,<28",
     "mcp>=2.3.0,<3",
     "a2wsgi>=1.10.10,<2",
 ]
+
+[project.optional-dependencies]
+# kept empty so 'puppetboard-dp[mcp]' from 8.2.0 still installs
+mcp = []
 
 [project.urls]
 Repository = "https://github.com/DennisPohlmann/puppetboard"

@@ -37,7 +37,7 @@ Python 3.12 or newer, e.g. the system Python of RHEL 10:
 
 ```bash
 python3 -m venv /opt/puppetboard
-/opt/puppetboard/bin/pip install 'puppetboard-dp[mcp]'
+/opt/puppetboard/bin/pip install puppetboard-dp
 useradd --system --home-dir /opt/puppetboard --shell /sbin/nologin puppetboard
 ```
 

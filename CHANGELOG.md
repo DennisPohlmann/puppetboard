@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+**Changed**
+
+- `pip install puppetboard-dp` now installs gunicorn and the MCP dependencies, so web, API and MCP run with
+  `gunicorn -k asgi puppetboard.asgi:app`. The extra `mcp` stays as an empty alias.
+
 ## [8.2.0](https://github.com/DennisPohlmann/puppetboard/tree/8.2.0) (2026-11-18)
 
 First release of the fork DennisPohlmann/puppetboard, based on 8.1.0.

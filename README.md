@@ -134,12 +134,12 @@ docker build -t puppetboard .
 
 ### Manually
 
-Install the package from PyPI into a virtual environment. The extra `mcp` adds gunicorn and what the MCP
-server needs; the package to import and run is still `puppetboard`.
+Install the package from PyPI into a virtual environment. It brings gunicorn and everything the MCP server
+needs; the package to import and run is still `puppetboard`.
 
 ```bash
 python3 -m venv /opt/puppetboard
-/opt/puppetboard/bin/pip install 'puppetboard-dp[mcp]'
+/opt/puppetboard/bin/pip install puppetboard-dp
 PUPPETBOARD_SETTINGS=/etc/puppetboard/settings.py \
   /opt/puppetboard/bin/gunicorn -k asgi -b 127.0.0.1:8080 puppetboard.asgi:app
 ```
