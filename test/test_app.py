@@ -142,3 +142,10 @@ def test_very_compact_css_rule():
     css = (Path(__file__).parent.parent / 'puppetboard' / 'static' / 'css'
            / 'puppetboard.css').read_text()
     assert '.ui.very-compact.table>tbody>tr>td' in css
+
+
+def test_status_column_shrinks_on_desktop_only():
+    css = (Path(__file__).parent.parent / 'puppetboard' / 'static' / 'css'
+           / 'puppetboard.css').read_text()
+    media = css.split('@media only screen and (min-width: 768px) {\n  #main-table')[1]
+    assert 'white-space: nowrap' in media.split('\n}\n')[0]

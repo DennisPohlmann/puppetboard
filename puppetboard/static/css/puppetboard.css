@@ -973,3 +973,16 @@ td.code {
 #theme-toggle i {
   margin: 0;
 }
+
+/* Status column of the node lists only as wide as its labels, so the
+   certname sits next to them; phones keep the wrapping labels. */
+@media only screen and (min-width: 768px) {
+  #main-table.very-compact th:first-child {
+    width: 1px;
+  }
+
+  #main-table.very-compact > tbody > tr > td:first-child {
+    white-space: nowrap;
+    padding-right: 3em;
+  }
+}
