@@ -125,3 +125,12 @@ def test_footer_links_to_fork(client, mock_puppetdb_environments, mock_puppetdb_
     page = client.get('/nodes').get_data(as_text=True)
     assert 'href="https://github.com/DennisPohlmann/puppetboard"' in page
     assert 'github.com/voxpupuli/puppetboard"' not in page
+
+
+def test_app_imports_every_view_module():
+    import sys
+    from pathlib import Path
+    views = Path(app.__file__).parent / 'views'
+    for module in views.glob('*.py'):
+        if module.stem != '__init__':
+            assert f'puppetboard.views.{module.stem}' in sys.modules, module.stem

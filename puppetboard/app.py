@@ -4,32 +4,9 @@ from datetime import datetime
 from flask import render_template, Response
 
 # these imports are required by Flask - DO NOT remove them although they look unused
-# noinspection PyUnresolvedReferences
-import puppetboard.views.catalogs  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.classes  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.dailychart  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.facts  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.index  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.inventory  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.metrics  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.nodes  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.query  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.radiator  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.reports  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.failures  # noqa: F401
-# noinspection PyUnresolvedReferences
-import puppetboard.views.api  # noqa: F401
+from puppetboard.views import (  # noqa: F401
+    catalogs, classes, dailychart, facts, index, inventory,
+    metrics, nodes, query, radiator, reports, failures, api)
 import puppetboard.errors  # noqa: F401
 
 from puppetboard.core import get_app, get_puppetdb, get_scheduler
