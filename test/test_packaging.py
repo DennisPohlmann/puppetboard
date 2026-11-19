@@ -22,7 +22,9 @@ def test_docs_name_only_the_asgi_entry_point():
     root = PYPROJECT.parent
     docs = [root / 'README.md', *sorted((root / 'docs').glob('*.md'))]
     for doc in docs:
-        assert 'puppetboard.app:app' not in doc.read_text(), doc
+        text = doc.read_text()
+        assert 'puppetboard.app:app' not in text, doc
+        assert 'flask --app' not in text, doc
 
 
 def test_no_wsgi_entry_file():

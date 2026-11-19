@@ -323,11 +323,11 @@ pylint --errors-only puppetboard test
 And you can run the app by executing:
 
 ```bash
-$ export PUPPETBOARD_SETTINGS=$PWD/settings.py # see settings.py.sample
-$ flask --app puppetboard.app run
+$ export PUPPETBOARD_SETTINGS=$PWD/settings.py # overrides for puppetboard/default_settings.py
+$ gunicorn -k asgi --reload -b 127.0.0.1:5000 puppetboard.asgi:app
 ```
 
-Host and port can be set with `--host` and `--port`. Every change comes with matching unit tests.
+`--reload` restarts the app when a file changes. Every change comes with matching unit tests.
 
 ### License
 
