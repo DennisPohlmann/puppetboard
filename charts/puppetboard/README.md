@@ -82,7 +82,7 @@ Details on the endpoints, tools and the CIS mapping: [docs/API.md](../../docs/AP
 | `api.enabled` / `api.rateLimit` | `false` / `120` | JSON API under `/api/v1/`, requests per minute and client. |
 | `mcp.enabled` | `false` | MCP server under `/mcp`. |
 | `mcp.allowedHosts` / `.allowedOrigins` | ingress/httpRoute hosts / – | Host and Origin headers accepted on `/mcp`. |
-| `config` | see values.yaml | Further settings as environment variables, names as in the [README](../../README.md#app-settings). |
+| `config` | see values.yaml | Further settings as environment variables, names as in the [docs/Configuration.md](../../docs/Configuration.md#app-settings). |
 | `workers` | `2` | Gunicorn workers per pod. |
 | `extraEnv` / `extraEnvFrom` / `extraVolumes` / `extraVolumeMounts` | – | Additions to the pod. |
 | `service.type` / `.port` | `ClusterIP` / `80` | Service. |

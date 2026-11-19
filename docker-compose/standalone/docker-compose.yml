@@ -20,7 +20,7 @@ services:
     #   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
     restart: unless-stopped
     # Every setting is in .env next to this file (cp .env.example .env);
-    # the README of the repository explains each one.
+    # docs/Configuration.md of the repository explains each one.
     env_file: .env
     ports:
       - "127.0.0.1:8080:8080"

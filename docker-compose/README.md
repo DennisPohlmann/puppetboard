@@ -18,5 +18,5 @@ read-only root file system. To build it from the checkout instead:
 docker compose -f docker-compose.yml -f ../standalone/docker-compose.build.yml up -d --build
 ```
 
-All settings are described in the [README](../README.md#app-settings) and,
+All settings are described in the [docs/Configuration.md](../docs/Configuration.md#app-settings) and,
 for API and MCP, in [docs/API.md](../docs/API.md).

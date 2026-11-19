@@ -7,7 +7,7 @@ clients, because Puppetboard has no authentication of its own (see
 
 Two ways to run it:
 
-- [Container image](#container-image) (recommended)
+- [Container image](#container-image) (recommended), also [managed by Puppet](#managed-by-puppet)
 - [Python package with gunicorn and systemd](#python-package-with-gunicorn-and-systemd)
 
 Then put [nginx](#nginx) or [Apache](#apache) in front.
@@ -28,8 +28,74 @@ docker run -d --name puppetboard --restart unless-stopped \
 
 The image runs as user `puppetboard` (uid 10001) on port 8080; the key and
 certificate files must be readable for that user. All settings are
-environment variables with the names from the [README](../README.md#app-settings).
+environment variables with the names from [Configuration](Configuration.md#app-settings).
 The same command works with rootless Podman.
+
+### Managed by Puppet
+
+With the [puppetlabs/docker](https://forge.puppet.com/modules/puppetlabs/docker) module Puppet can run the container,
+here on the PuppetDB host:
+
+```puppet
+include docker
+
+docker::image { 'ghcr.io/dennispohlmann/puppetboard': }
+
+docker::run { 'puppetboard':
+  image => 'ghcr.io/dennispohlmann/puppetboard',
+  env   => [
+    'PUPPETDB_HOST=127.0.0.1',
+    'PUPPETDB_PORT=8080',
+    'PUPPETBOARD_PORT=8088',
+    'SECRET_KEY=XXXXXXXX',
+  ],
+  net   => 'host',
+}
+```
+
+If you want to have all features enabled, you must use SSL talking to PuppetDB:
+
+```puppet
+file { '/etc/puppetboard':
+  ensure => directory,
+}
+file { '/etc/puppetboard/key.pem':
+  ensure => file,
+  mode   => '0644',
+  source => "/etc/puppetlabs/puppet/ssl/private_keys/${facts['networking']['fqdn']}.pem",
+}
+file { '/etc/puppetboard/cert.pem':
+  ensure => file,
+  mode   => '0644',
+  source => "/etc/puppetlabs/puppet/ssl/certs/${facts['networking']['fqdn']}.pem",
+}
+
+include docker
+
+docker::image { 'ghcr.io/dennispohlmann/puppetboard': }
+
+docker::run { 'puppetboard':
+  image   => 'ghcr.io/dennispohlmann/puppetboard',
+  volumes => ['/etc/puppetboard:/etc/puppetboard:ro'],
+  env     => [
+    'PUPPETDB_HOST=puppet', # this must be the certname or DNS_ALT_NAME of the PuppetDB host
+    'PUPPETDB_PORT=8081',
+    'PUPPETBOARD_PORT=8080',
+    'ENABLE_CATALOG=true',
+    'PUPPETDB_SSL_VERIFY=false',
+    'PUPPETDB_KEY=/etc/puppetboard/key.pem',
+    'PUPPETDB_CERT=/etc/puppetboard/cert.pem',
+    'SECRET_KEY=XXXXXXXX',
+    'DEFAULT_ENVIRONMENT=*',
+  ],
+  net     => 'host',
+}
+```
+
+Within an air gapped environment you want to load all content from your local puppetboard web service.
+Add: `'OFFLINE_MODE=true',` to the `env` parameter list of the `docker::run` Puppet type.
+
+To build the image yourself from a checkout: `docker build -t puppetboard .`
 
 ## Python package with gunicorn and systemd
 

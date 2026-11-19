@@ -83,7 +83,7 @@ mcp:
   allowedOrigins: []
 
 # -- Further Puppetboard settings as environment variables, with the names
-# of the README ("App settings"). Values are passed as strings. Sensitive
+# of docs/Configuration.md ("App settings"). Values are passed as strings. Sensitive
 # values belong into a Secret via extraEnvFrom.
 # @default -- see values.yaml
 config:
