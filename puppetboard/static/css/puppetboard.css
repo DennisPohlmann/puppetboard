@@ -669,6 +669,12 @@ h1.ui.header.no-margin-bottom {
   padding: 0.15em 0.1em;
 }
 
+/* DataTables rewrites the class list and drops the second "very", so the
+   rule above never matches there; .very-compact survives that. */
+.ui.very-compact.table>tbody>tr>td {
+  padding: 0.3em 0.7em;
+}
+
 .factlist li {
   word-wrap: break-word;
 }

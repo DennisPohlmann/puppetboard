@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from bs4 import BeautifulSoup
 
 from puppetboard import app
@@ -129,8 +131,14 @@ def test_footer_links_to_fork(client, mock_puppetdb_environments, mock_puppetdb_
 
 def test_app_imports_every_view_module():
     import sys
-    from pathlib import Path
     views = Path(app.__file__).parent / 'views'
     for module in views.glob('*.py'):
         if module.stem != '__init__':
             assert f'puppetboard.views.{module.stem}' in sys.modules, module.stem
+
+
+def test_very_compact_css_rule():
+    # the class added to DataTables tables must carry the compact padding
+    css = (Path(__file__).parent.parent / 'puppetboard' / 'static' / 'css'
+           / 'puppetboard.css').read_text()
+    assert '.ui.very-compact.table>tbody>tr>td' in css

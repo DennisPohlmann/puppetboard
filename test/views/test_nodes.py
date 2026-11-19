@@ -19,6 +19,8 @@ def test_default_node_view(client, mocker,
     assert 'Facts' in headers
     facts_column_index = headers.index('Facts')
 
+    assert 'very-compact' in soup.select_one('#main-table')['class']
+
     rows = soup.select('#main-table tbody tr')
     assert len(rows) >= 5
 
@@ -40,6 +42,7 @@ def test_node_view(client, mocker,
 
     vals = soup.find_all('table', {"id": "facts_table"})
     assert len(vals) == 1
+    assert 'very-compact' in vals[0]['class']
 
     vals = soup.find_all('table', {"id": "reports_table"})
     assert len(vals) == 1

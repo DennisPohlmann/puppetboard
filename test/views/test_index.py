@@ -19,6 +19,9 @@ def test_get_index(client, mocker,
     soup = BeautifulSoup(rv.data, 'html.parser')
     assert soup.title.contents[0] == 'Puppetboard'
     assert rv.status_code == 200
+    # DataTables drops the second "very" from the class list, so the
+    # compact row padding hangs on the extra very-compact class
+    assert 'very-compact' in soup.select_one('#main-table')['class']
 
 
 def test_index_all(client, mocker,
