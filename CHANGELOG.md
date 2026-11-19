@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+**Removed**
+
+- WSGI is no longer supported: `puppetboard.asgi:app` (`gunicorn -k asgi`) is the only entry point. Setups with
+  Apache mod_wsgi or `gunicorn puppetboard.app:app` switch to it, see [docs/Deployment-setups.md](docs/Deployment-setups.md).
+
 ## [8.2.1](https://github.com/DennisPohlmann/puppetboard/tree/8.2.1) (2026-11-19)
 
 **Changed**

@@ -23,7 +23,7 @@ Report it privately on GitHub: **Security** tab of the repository,
 
 Helpful to include:
 
-- the commit or image you run and how (container, gunicorn WSGI or ASGI),
+- the commit or image you run and how (container or gunicorn),
   with the settings that matter (`ENABLE_API`, `ENABLE_MCP`,
   `ENABLE_QUERY`, `MCP_ALLOWED_HOSTS`, `OFFLINE_MODE`);
 - the steps to reproduce, and what an attacker gains;

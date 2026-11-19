@@ -19,4 +19,4 @@ F.e. 8.2.0
 
 F.e.:
 * container image ghcr.io/dennispohlmann/puppetboard:8.2.0 with Podman on RHEL 10,
-* or the PyPI package puppetboard-dp 8.2.0 with Python 3.12 and gunicorn (WSGI or ASGI).
+* or the PyPI package puppetboard-dp 8.2.0 with Python 3.12 and gunicorn.

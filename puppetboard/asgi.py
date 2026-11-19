@@ -1,8 +1,6 @@
-"""ASGI entry point: the Flask web UI and API plus the MCP server on /mcp.
+"""The entry point: the Flask web UI and API plus the MCP server on /mcp.
 
     gunicorn -k asgi puppetboard.asgi:app
-
-The Flask app keeps working on its own as WSGI (puppetboard.app:app).
 """
 from a2wsgi import WSGIMiddleware
 

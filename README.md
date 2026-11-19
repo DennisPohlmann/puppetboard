@@ -144,9 +144,8 @@ PUPPETBOARD_SETTINGS=/etc/puppetboard/settings.py \
   /opt/puppetboard/bin/gunicorn -k asgi -b 127.0.0.1:8080 puppetboard.asgi:app
 ```
 
-`puppetboard.asgi:app` serves the web interface, the JSON API and the MCP server. The plain WSGI app
-`puppetboard.app:app` (without MCP) works with any WSGI server. See [Deployment setups](docs/Deployment-setups.md)
-for a systemd unit and a reverse proxy with authentication.
+`puppetboard.asgi:app` is the only entry point and serves the web interface, the JSON API and the MCP server.
+See [Deployment setups](docs/Deployment-setups.md) for a systemd unit and a reverse proxy with authentication.
 
 ## Configuration<a id="configuration"></a>
 
@@ -272,7 +271,7 @@ Other settings that might be interesting, in no particular order:
     Defaults to `True`.
 - `ENABLE_API`: If set to `True` serves the read-only JSON API under `/api/v1/`. Defaults to `False`.
     See [docs/API.md](docs/API.md) for the endpoints and the `API_*` settings.
-- `ENABLE_MCP`: If set to `True` serves a read-only MCP server under `/mcp` (ASGI entry point only).
+- `ENABLE_MCP`: If set to `True` serves a read-only MCP server under `/mcp`.
     Needs `MCP_ALLOWED_HOSTS`. Defaults to `False`. See [docs/API.md](docs/API.md).
 - `ENABLE_CLASS`: If set to `True` allows the user to view the number of resource events (number of changed resources in the last report) grouped by class.
     The resource events are grouped by their status ('failure', 'success', 'noop').

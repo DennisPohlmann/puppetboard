@@ -83,9 +83,8 @@ systemctl daemon-reload
 systemctl enable --now puppetboard
 ```
 
-`puppetboard.asgi:app` serves the web interface, the JSON API and the MCP
-server. If you need neither MCP nor ASGI, the WSGI app `puppetboard.app:app`
-runs with any WSGI server, e.g. `gunicorn puppetboard.app:app`.
+`puppetboard.asgi:app` is the only entry point and serves the web interface,
+the JSON API and the MCP server.
 
 Under a URL prefix such as `https://example.com/puppetboard/`, add
 `--root-path /puppetboard` to gunicorn (container: `PUPPETBOARD_URL_PREFIX`).
