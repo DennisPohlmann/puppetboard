@@ -26,3 +26,9 @@ def test_relative_links_resolve(doc):
         assert dest.exists(), f'{doc}: {target}'
         if anchor and dest.suffix == '.md':
             assert anchor in _anchors(dest), f'{doc}: {target}'
+
+
+def test_readme_images_are_absolute_for_pypi():
+    # PyPI shows README.md without the repository, so relative images break there
+    for match in re.finditer(r'!\[[^\]]*\]\(([^)\s]+)\)|<img src="([^"]+)"', (ROOT / 'README.md').read_text()):
+        assert (match.group(1) or match.group(2)).startswith('https://'), match.group(0)

@@ -1,4 +1,4 @@
-<p align="center"><img src="puppetboard/static/favicon.svg" alt="Puppetboard" width="96"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/puppetboard/static/favicon.svg" alt="Puppetboard" width="96"></p>
 
 # Puppetboard
 
@@ -13,7 +13,7 @@ This is a fork of [voxpupuli/puppetboard](https://github.com/voxpupuli/puppetboa
 runs on ASGI only, keeps its dependencies current and ships a hardened container image, a Helm chart and
 Compose examples.
 
-![Overview](screenshots/overview.png)
+![Overview](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/overview.png)
 
 ## What this fork adds
 
@@ -51,15 +51,15 @@ The full list of changes is in the [CHANGELOG](CHANGELOG.md).
 
 **Single node with its reports**
 
-![Single node](screenshots/node.png)
+![Single node](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/node.png)
 
 **Failures: the errors of all failing nodes**
 
-![Failures](screenshots/failures.png)
+![Failures](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/failures.png)
 
 **A fact with its chart**
 
-![Single fact, with graphs](screenshots/fact.png)
+![Single fact, with graphs](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/fact.png)
 
 All views: [docs/Screenshots.md](docs/Screenshots.md).
 
