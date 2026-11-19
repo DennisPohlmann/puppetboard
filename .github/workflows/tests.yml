@@ -26,13 +26,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          sudo apt install python3-poetry
-          poetry install --with=test --extras mcp
-          poetry run mypy --install-types --non-interactive puppetboard/ test/
+          pip install -r requirements-test.txt -e .
+          mypy --install-types --non-interactive puppetboard/ test/
       - name: Test
         run: |
-          poetry run pytest --cov=. --cov-report=xml --strict-markers --mypy -v puppetboard test
-          poetry run pylint --errors-only puppetboard test
+          pytest --cov=. --cov-report=xml --strict-markers --mypy -v puppetboard test
+          pylint --errors-only puppetboard test
       - name: Upload coverage to Codecov
         # only where a token is configured; the fork has none
         if: env.CODECOV_TOKEN != ''
@@ -42,7 +41,7 @@ jobs:
           fail_ci_if_error: true
       - name: Build
         run: |
-          poetry build -v
+          python -m build
 
   build_docker_image:
     name: 'Test building a container'
@@ -68,9 +67,8 @@ jobs:
           python-version: 3.13
       - name: Run bandit
         run: |
-          sudo apt install python3-poetry
-          poetry install --with=test --extras mcp
-          poetry run bandit -r puppetboard
+          pip install -r requirements-test.txt -e .
+          bandit -r puppetboard
 
   tests:
     needs:

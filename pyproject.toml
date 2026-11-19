@@ -63,21 +63,6 @@ include = [
     { path = "CHANGELOG.md", format = "sdist" },
 ]
 
-
-[tool.poetry.group.test.dependencies]
-coverage = "^7.6.9"
-mockey = {version = "*", python = ">=3.10"}
-pytest = ">=8.3.4,<10.0.0"
-pylint = ">=3.3.2,<5.0.0"
-pytest-cov = ">=6,<8"
-pytest-mock = "^3.14.0"
-pytest-mypy = ">=0.10.3,<1.2.0"
-pytest-randomly = ">=3.16,<6.0"
-bandit = "^1.8.0"
-beautifulsoup4 = "^4"
-types-requests = "^2.32.0.20241016"
-
-
 [build-system]
 requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"

@@ -4,8 +4,7 @@ Releases of this fork are published as `puppetboard-dp` on PyPI and as
 `ghcr.io/dennispohlmann/puppetboard` in the GitHub Container Registry.
 A release needs Dennis' explicit "RELEASE GO" and a passed security gate.
 
-1. Set the new version in [pyproject.toml](pyproject.toml), for example with
-   `poetry version minor`, and describe the changes in
+1. Set the new version in [pyproject.toml](pyproject.toml) and describe the changes in
    [CHANGELOG.md](CHANGELOG.md). Commit both (signed) to `main`.
 2. Tag the commit with the plain version, without a `v`, and push the tag:
 
