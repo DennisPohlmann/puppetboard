@@ -1,4 +1,6 @@
 import tomllib
+
+import pytest
 from pathlib import Path
 
 PYPROJECT = Path(__file__).resolve().parent.parent / 'pyproject.toml'
@@ -27,8 +29,9 @@ def test_docs_name_only_the_asgi_entry_point():
         assert 'flask --app' not in text, doc
 
 
-def test_no_wsgi_entry_file():
-    assert not (PYPROJECT.parent / 'wsgi.py').exists()
+@pytest.mark.parametrize('name', ['wsgi.py', 'HISTORY.md'])
+def test_removed_leftover_files_stay_gone(name):
+    assert not (PYPROJECT.parent / name).exists()
 
 
 def test_dropped_test_dependencies_stay_out():
