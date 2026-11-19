@@ -29,7 +29,7 @@ def test_docs_name_only_the_asgi_entry_point():
         assert 'flask --app' not in text, doc
 
 
-@pytest.mark.parametrize('name', ['wsgi.py', 'HISTORY.md', 'settings.py.sample', '.pre-commit-config.yaml', 'poetry.lock'])
+@pytest.mark.parametrize('name', ['wsgi.py', 'HISTORY.md', 'settings.py.sample', '.pre-commit-config.yaml', 'poetry.lock', 'setup.cfg'])
 def test_removed_leftover_files_stay_gone(name):
     assert not (PYPROJECT.parent / name).exists()
 

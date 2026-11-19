@@ -66,3 +66,12 @@ include = [
 [build-system]
 requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+ignore_missing_imports = true
+ignore_errors = false
+pretty = true
+
+[[tool.mypy.overrides]]
+module = "puppetboard.docker_settings"
+ignore_errors = true
