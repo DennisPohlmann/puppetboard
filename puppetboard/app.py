@@ -1,6 +1,4 @@
 import logging
-import os
-import sys
 from datetime import datetime
 
 from flask import render_template, Response
@@ -41,7 +39,6 @@ from puppetboard.utils import is_a_test, check_db_version, check_secret_key
 app = get_app()
 puppetdb = get_puppetdb()
 get_scheduler()
-running_as = os.path.basename(sys.argv[0])
 if not is_a_test():
     check_db_version(puppetdb)
     check_secret_key(app.config.get('SECRET_KEY'))
