@@ -29,3 +29,10 @@ def test_docs_name_only_the_asgi_entry_point():
 
 def test_no_wsgi_entry_file():
     assert not (PYPROJECT.parent / 'wsgi.py').exists()
+
+
+def test_dropped_test_dependencies_stay_out():
+    pins = {line.split('==')[0].strip() for line in (PYPROJECT.parent / 'requirements-test.txt').read_text().splitlines()}
+    group = tomllib.loads(PYPROJECT.read_text())['tool']['poetry']['group']['test']['dependencies']
+    for name in ('pep8', 'cov-core', 'mock', 'types-toml', 'types-setuptools', 'pytest-pylint'):
+        assert name not in pins and name not in group, name

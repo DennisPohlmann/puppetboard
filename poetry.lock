@@ -2100,22 +2100,6 @@ mypy = ">=1.0"
 pytest = ">=7.0"
 
 [[package]]
-name = "pytest-pylint"
-version = "0.21.0"
-description = "pytest plugin to check source code with pylint"
-optional = false
-python-versions = ">=3.7"
-groups = ["test"]
-files = [
-    {file = "pytest-pylint-0.21.0.tar.gz", hash = "sha256:88764b8e1d5cfa18809248e0ccc2fc05035f08c35f0b0222ddcfea1c3c4e553e"},
-    {file = "pytest_pylint-0.21.0-py3-none-any.whl", hash = "sha256:f10d9eaa72b9fbe624ee4b55da0481f56482eee0a467afc1ee3ae8b1fefbd0b4"},
-]
-
-[package.dependencies]
-pylint = ">=2.15.0"
-pytest = ">=7.0"
-
-[[package]]
 name = "pytest-randomly"
 version = "5.1.0"
 description = "Pytest plugin to randomly order tests and control random.seed."
@@ -2732,4 +2716,4 @@ mcp = []
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4"
-content-hash = "13c9de039e139f5789067e85e7c5620dce1cdddc7a01d6a0fc5334b9a251d0be"
+content-hash = "65d1974dbbe7968ab9abae411c01dd1cc0422db88453095cd165021e3d4f9bb8"
