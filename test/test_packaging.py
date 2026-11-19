@@ -39,3 +39,8 @@ def test_dropped_test_dependencies_stay_out():
     group = tomllib.loads(PYPROJECT.read_text())['tool']['poetry']['group']['test']['dependencies']
     for name in ('pep8', 'cov-core', 'mock', 'types-toml', 'types-setuptools', 'pytest-pylint'):
         assert name not in pins and name not in group, name
+
+
+def test_workflows_do_not_trigger_on_master():
+    for workflow in (PYPROJECT.parent / '.github' / 'workflows').glob('*.yml'):
+        assert '- master' not in workflow.read_text(), workflow
