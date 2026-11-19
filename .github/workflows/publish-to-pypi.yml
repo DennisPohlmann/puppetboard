@@ -35,6 +35,8 @@ jobs:
           version=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
           [ "$version" = "$GITHUB_REF_NAME" ] ||
             { echo "::error::tag $GITHUB_REF_NAME does not match the version in pyproject.toml"; exit 1; }
+          # fails before publishing if CHANGELOG.md has no section for this version
+          python .github/scripts/release_notes.py "$GITHUB_REF_NAME" > "$RUNNER_TEMP/release-notes.md"
           pip install -r requirements-test.txt -e .
           pytest -q
           python -m build
@@ -43,4 +45,5 @@ jobs:
       - name: Create release in GitHub
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --generate-notes
+        # CHANGELOG section first, then GitHub's generated "Full Changelog" link
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-notes.md" --generate-notes

@@ -20,7 +20,9 @@ otherwise:
 - `publish-to-pypi.yml` checks that the tag matches the version in
   `pyproject.toml`, runs the unit tests, builds the package and uploads it to PyPI with
   Trusted Publishing (environment `pypi`, no API token), then creates the
-  GitHub release.
+  GitHub release. Its notes are the version's section of `CHANGELOG.md`
+  followed by the "Full Changelog" link; without that section the workflow
+  stops before publishing.
 - `publish-docker.yml` builds the image for amd64 and arm64 and pushes
   `ghcr.io/dennispohlmann/puppetboard:<version>` and `:latest`.
 - `chart.yml` checks the Helm chart and pushes it with the tag as chart and
