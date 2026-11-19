@@ -86,6 +86,34 @@ systemctl enable --now puppetboard
 `puppetboard.asgi:app` is the only entry point and serves the web interface,
 the JSON API and the MCP server.
 
+Check it with `systemctl status puppetboard` and `journalctl -u puppetboard`.
+gunicorn answers on `127.0.0.1:8080` only; the reverse proxy below is the
+way in. After changing `settings.py` or updating the package, run
+`systemctl restart puppetboard`.
+
+### SELinux on RHEL
+
+systemd starts a service as `unconfined_service_t` only if its binary is
+labelled `bin_t`. Under `/opt` the default policy already does that. A venv
+elsewhere, e.g. `/srv/puppetboard/virtenv-puppetboard` from the
+puppet-puppetboard module, gets `var_t`, or keeps `httpd_sys_content_t`
+from an earlier Apache mod_wsgi setup. gunicorn then stays in `init_t` and
+may neither read its own files nor connect to PuppetDB. Label the venv once
+instead of building an `audit2allow` module for these denials:
+
+```bash
+semanage fcontext -a -t usr_t '/srv/puppetboard(/.*)?'
+semanage fcontext -a -t bin_t '/srv/puppetboard/virtenv-puppetboard/bin(/.*)?'
+restorecon -RF /srv/puppetboard
+systemctl restart puppetboard
+```
+
+Check: `ls -Z <venv>/bin/gunicorn` shows `bin_t` and
+`ps -eZ | grep gunicorn` shows `unconfined_service_t`. If an older rule
+labels the path differently, `semanage fcontext -l | grep puppetboard`
+shows it and `semanage fcontext -d '<path pattern>'` removes it. The
+reverse proxy also needs `setsebool -P httpd_can_network_connect 1`.
+
 Under a URL prefix such as `https://example.com/puppetboard/`, add
 `--root-path /puppetboard` to gunicorn (container: `PUPPETBOARD_URL_PREFIX`).
 
