@@ -46,3 +46,5 @@ def test_node_view(client, mocker,
 
     vals = soup.find_all('table', {"id": "reports_table"})
     assert len(vals) == 1
+    scripts = [t['src'] for t in soup.select('script[src]')]
+    assert scripts.count('/static/js/dailychart.js') == 1

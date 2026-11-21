@@ -1,12 +1,10 @@
 {% extends 'layout.html' %}
 {% import '_macros.html' as macros %}
-{% block head %}
 {% block script %}
 {% if config.DAILY_REPORTS_CHART_ENABLED %}
 <script src="{{url_for('static', filename='js/dailychart.js')}}"></script>
 {% endif %}
 {% endblock script %}
-{% endblock head %}
 {% block onload_script %}
 {% macro extra_options(caller) %}
   'pagingType': 'simple',

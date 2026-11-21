@@ -24,6 +24,10 @@ def test_get_index(client, mocker,
     assert 'very-compact' in soup.select_one('#main-table')['class']
     charts = [c['data-metric'] for c in soup.select('.run-times-chart')]
     assert charts == ['catalog_application', 'fact_generation']
+    # each chart script once, or every chart is drawn and fetched twice
+    scripts = [t['src'] for t in soup.select('script[src]')]
+    assert scripts.count('/static/js/dailychart.js') == 1
+    assert scripts.count('/static/js/runtimes.js') == 1
     for toggle in ('.daily-reports-chart-range-toggle', '.run-times-range-toggle'):
         assert [b['data-range-value'] for b in soup.select(toggle + ' button')] == ['today', 'days']
 
