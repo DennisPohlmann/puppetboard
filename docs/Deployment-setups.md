@@ -241,8 +241,11 @@ server {
         Require valid-user
     </Location>
 
+    # same headers as the nginx block: Host, X-Forwarded-For/-Host (ProxyAddHeaders), -Proto
     ProxyPreserveHost On
+    ProxyAddHeaders On
     RequestHeader set X-Forwarded-Proto "https"
+    ProxyTimeout 60
     ProxyPass        / http://127.0.0.1:8080/
     ProxyPassReverse / http://127.0.0.1:8080/
 </VirtualHost>

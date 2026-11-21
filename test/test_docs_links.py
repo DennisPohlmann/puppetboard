@@ -39,3 +39,11 @@ def test_systemd_unit_sets_user_and_group():
     doc = (ROOT / 'docs' / 'Deployment-setups.md').read_text()
     assert re.search(r'^User=puppetboard\nGroup=puppetboard$', doc, re.M)
     assert re.search(r'^useradd --system --user-group .* puppetboard$', doc, re.M)
+
+
+def test_apache_proxy_matches_nginx_headers():
+    # nginx sets Host, X-Forwarded-For/-Proto/-Host and a 60 s timeout; Apache must send the same
+    apache = (ROOT / 'docs' / 'Deployment-setups.md').read_text().split('```apache', 1)[1].split('```', 1)[0]
+    for line in ('ProxyPreserveHost On', 'ProxyAddHeaders On', 'RequestHeader set X-Forwarded-Proto "https"',
+                 'ProxyTimeout 60'):
+        assert line in apache, line

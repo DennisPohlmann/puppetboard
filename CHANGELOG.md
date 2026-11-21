@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - The container image reads `QUERY_PRESETS_FILE` from the environment, so saved queries work there too.
 - `pip install puppetboard-dp` requires gunicorn 24 or newer, the first release with the `-k asgi` worker.
 - The systemd unit in the deployment docs also sets `Group=puppetboard`, and `useradd --user-group` creates it.
+- The Apache example sends the same proxy headers and 60 s timeout as the nginx one.
 
 **Removed**
 
