@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - The SELinux labels in the deployment docs use the venv path of the install, `/opt/puppetboard`.
 - The systemd setup in the deployment docs keeps all PuppetDB files in `/etc/puppetboard` and makes
   `settings.py` and `key.pem` readable for the group `puppetboard` only.
+- The nginx and Apache examples say to use port 8088 for the Puppet-managed container.
 
 **Removed**
 

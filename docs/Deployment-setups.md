@@ -213,6 +213,8 @@ All container variables: [Configuration](Configuration.md#container-variables).
 
 TLS and Basic-Auth for everything. Puppetboard trusts the `X-Forwarded-*`
 headers of exactly one proxy, so put it directly behind this one.
+Both examples reach Puppetboard on `127.0.0.1:8080`; for the
+[Puppet-managed container](#managed-by-puppet) use port 8088.
 
 ```nginx
 server {
