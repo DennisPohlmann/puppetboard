@@ -61,7 +61,11 @@ The full list of changes is in the [CHANGELOG](CHANGELOG.md).
 
 ![Single fact, with graphs](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/fact.png)
 
-All views: [docs/Screenshots.md](docs/Screenshots.md).
+**MCP server: Claude asks which nodes failed and why**
+
+![MCP server answering which nodes failed](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/mcp_failed_nodes.png)
+
+All views: [docs/Screenshots.md](docs/Screenshots.md). More MCP examples: [docs/API.md](docs/API.md#examples).
 
 ## Requirements
 

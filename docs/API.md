@@ -136,6 +136,16 @@ Example client configuration (Claude Code):
 claude mcp add --transport http puppetboard https://puppetboard.example.com/mcp --header "Authorization: Basic $(printf user:pass | base64)"
 ```
 
+### Examples
+
+Real answers from Claude Code connected to `/mcp` of a test instance, with the tool calls it made.
+
+![Which nodes failed their last Puppet run, and why?](../screenshots/mcp_failed_nodes.png)
+
+![Which operating system versions do my nodes run, per environment?](../screenshots/mcp_os_versions.png)
+
+![Which nodes have not reported to Puppet in the last hour?](../screenshots/mcp_unreported.png)
+
 ## Securing API and MCP
 
 Puppetboard itself does not authenticate anyone. Both `/api/v1/` and `/mcp`
