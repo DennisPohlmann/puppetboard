@@ -34,10 +34,11 @@ jQuery(function ($) {
       size: {height: 200},
       line: {connectNull: false},
       axis: {
-        // MM-DD keeps the labels on one line on phones; hours are UTC, shown in local time
+        // MM-DD keeps the labels on one line on phones; hours are UTC, shown in local time,
+        // turned upright so all 24 fit
         x: {type: "category", tick: {format: function (index, label) {
           return range === "today" ? moment(label).format("HH:mm") : label.slice(5);
-        }, culling: range === "today" ? {max: 8} : false, multiline: false}},
+        }, culling: false, rotate: range === "today" ? -90 : 0, multiline: false}},
         y: {
           min: 0,
           padding: {bottom: 0},

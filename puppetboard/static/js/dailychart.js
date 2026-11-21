@@ -100,8 +100,9 @@ jQuery(function ($) {
           type: "category",
           tick: {
             format: xTick,
-            // 24 hourly labels do not fit on a phone; show every few
-            culling: range === "today" ? {max: 8} : false,
+            // every hour gets a label; turned upright so 24 of them fit on a phone
+            culling: false,
+            rotate: range === "today" ? -90 : 0,
             multiline: range !== "today",
           },
         },
