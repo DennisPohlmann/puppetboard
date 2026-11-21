@@ -242,3 +242,10 @@ def test_scheduler_jobs_custom(cleanup_env):
         assert 'trigger' in job
         assert 'seconds' in job
         assert 600 == job['seconds']
+
+
+def test_query_presets_file(cleanup_env):
+    assert docker_settings.QUERY_PRESETS_FILE is None
+    os.environ['QUERY_PRESETS_FILE'] = '/etc/puppetboard/query_presets.yaml'
+    reload(docker_settings)
+    assert docker_settings.QUERY_PRESETS_FILE == '/etc/puppetboard/query_presets.yaml'

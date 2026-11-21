@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - MCP tool `get_current_time` and server instructions that explain the UTC timestamps and which come from the
   agent's clock, so assistants no longer report Puppet runs "in the future".
 
+**Fixed**
+
+- The container image reads `QUERY_PRESETS_FILE` from the environment, so saved queries work there too.
+
 **Removed**
 
 - WSGI is no longer supported: `puppetboard.asgi:app` (`gunicorn -k asgi`) is the only entry point. Setups with

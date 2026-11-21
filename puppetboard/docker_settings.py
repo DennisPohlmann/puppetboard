@@ -98,6 +98,7 @@ DISPLAYED_METRICS = [x.strip() for x in os.getenv('DISPLAYED_METRICS',
 
 OFFLINE_MODE = coerce_bool(os.getenv('OFFLINE_MODE'), False)
 ENABLE_CATALOG = coerce_bool(os.getenv('ENABLE_CATALOG'), False)
+QUERY_PRESETS_FILE = os.getenv('QUERY_PRESETS_FILE') or None
 OVERVIEW_FILTER = os.getenv('OVERVIEW_FILTER', None)
 PAGE_TITLE = os.getenv('PAGE_TITLE', 'Puppetboard')
 
