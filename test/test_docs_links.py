@@ -47,3 +47,14 @@ def test_apache_proxy_matches_nginx_headers():
     for line in ('ProxyPreserveHost On', 'ProxyAddHeaders On', 'RequestHeader set X-Forwarded-Proto "https"',
                  'ProxyTimeout 60'):
         assert line in apache, line
+
+
+def test_systemd_install_unit_and_selinux_use_the_same_venv():
+    # install, unit and SELinux labels drifted apart once (/opt vs /srv); keep them on one venv path
+    doc = (ROOT / 'docs' / 'Deployment-setups.md').read_text()
+    section = doc.split('## Python package with gunicorn and systemd', 1)[1].split('\n## ', 1)[0]
+    venv = re.search(r'^python3 -m venv (\S+)$', section, re.M).group(1)
+    assert re.search(rf'^ExecStart={re.escape(venv)}/bin/gunicorn ', section, re.M)
+    assert f"semanage fcontext -a -t usr_t '{venv}(/.*)?'" in section
+    assert f"semanage fcontext -a -t bin_t '{venv}/bin(/.*)?'" in section
+    assert f'restorecon -RF {venv}\n' in section

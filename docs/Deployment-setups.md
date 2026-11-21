@@ -174,19 +174,22 @@ way in. After changing `settings.py` or updating the package, run
 ### SELinux on RHEL
 
 systemd starts a service as `unconfined_service_t` only if its binary is
-labelled `bin_t`. Under `/opt` the default policy already does that. A venv
-elsewhere, e.g. `/srv/puppetboard/virtenv-puppetboard` from the
-puppet-puppetboard module, gets `var_t`, or keeps `httpd_sys_content_t`
-from an earlier Apache mod_wsgi setup. gunicorn then stays in `init_t` and
-may neither read its own files nor connect to PuppetDB. Label the venv once
-instead of building an `audit2allow` module for these denials:
+labelled `bin_t`. pip creates the venv files with the label of the parent
+directory, so `/opt/puppetboard/bin` starts out as `usr_t` like the rest of
+`/opt`. gunicorn then stays in `init_t` and may neither read its own files
+nor connect to PuppetDB. Label the venv from the install above once instead
+of building an `audit2allow` module for these denials:
 
 ```bash
-semanage fcontext -a -t usr_t '/srv/puppetboard(/.*)?'
-semanage fcontext -a -t bin_t '/srv/puppetboard/virtenv-puppetboard/bin(/.*)?'
-restorecon -RF /srv/puppetboard
+semanage fcontext -a -t usr_t '/opt/puppetboard(/.*)?'
+semanage fcontext -a -t bin_t '/opt/puppetboard/bin(/.*)?'
+restorecon -RF /opt/puppetboard
 systemctl restart puppetboard
 ```
+
+A venv elsewhere, e.g. `/srv/puppetboard/virtenv-puppetboard` from the
+puppet-puppetboard module, gets `var_t` or keeps `httpd_sys_content_t` from
+an earlier Apache mod_wsgi setup: use the same three commands with its path.
 
 Check: `ls -Z <venv>/bin/gunicorn` shows `bin_t` and
 `ps -eZ | grep gunicorn` shows `unconfined_service_t`. If an older rule
