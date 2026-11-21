@@ -38,7 +38,7 @@ The machine-readable description is served at `/api/v1/openapi.json`
 | `/api/v1/nodes/<certname>/reports` | Report summaries of the node, newest first. |
 | `/api/v1/reports/<hash>` | One report with logs, metrics and resource events. |
 | `/api/v1/nodes/<certname>/resources?type=&title=` | Catalog resources of the node, e.g. `type=package`, only with `ENABLE_CATALOG`. |
-| `/api/v1/query?pql=` | Result of a PQL query, only with `ENABLE_QUERY`. |
+| `/api/v1/query?pql=` | Result of a PQL query, only with `ENABLE_QUERY`. No `limit`/`offset`; `meta` is `{"count": n, "truncated": true}` when the result hit `API_MAX_LIMIT`. |
 
 List endpoints take `limit` and `offset` and answer
 
