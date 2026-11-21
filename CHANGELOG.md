@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 **Added**
 
+- Overview: two charts below the daily reports chart with the fastest, slowest and average catalog application
+  and fact generation time of all agent runs per day (report metrics `time.catalog_application` and
+  `time.fact_generation`).
 - MCP tool `get_current_time` and server instructions that explain the UTC timestamps and which come from the
   agent's clock, so assistants no longer report Puppet runs "in the future".
 

@@ -74,7 +74,7 @@ SECRET_KEY = 'output of: openssl rand -hex 32'
 | `TABLE_COUNT_SELECTOR` | `10, 20, 50, 100, 500` | Choices for rows per page. |
 | `WITH_EVENT_NUMBERS` | `True` | Show the number of changed resources per node; `False` is faster with several hundred nodes. |
 | `DISPLAYED_METRICS` | `resources.total`, `events.failure`, `events.success`, `resources.skipped`, `events.noop` | Report metrics shown in the node summary. |
-| `DAILY_REPORTS_CHART_ENABLED` | `True` | Daily chart of report results on the overview and node pages. |
+| `DAILY_REPORTS_CHART_ENABLED` | `True` | Daily chart of report results on the overview and node pages, plus the run time charts on the overview. |
 | `DAILY_REPORTS_CHART_DAYS` | `8` | Days in that chart. |
 | `DAILY_REPORTS_CHART_MODE` | `stacked` | `stacked` or `split`. |
 | `SHOW_ERROR_AS` | `friendly` | `friendly` shortens Puppet errors on the report and failures pages, `raw` shows them unchanged. |

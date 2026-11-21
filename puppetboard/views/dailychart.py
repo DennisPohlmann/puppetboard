@@ -112,3 +112,61 @@ def get_daily_reports_chart(db, env, days_number, certname=None):
     # one count query per day; run them side by side instead of one after another
     with ThreadPoolExecutor(max_workers=min(days_number, 8) or 1) as pool:
         return list(pool.map(one_day, _iter_dates(days_number, reverse=True)))
+
+
+# agent report metrics in the 'time' category, in seconds
+RUN_TIME_METRICS = ('catalog_application', 'fact_generation')
+
+
+@app.route('/run_times_chart.json',
+           defaults={'env': app.config['DEFAULT_ENVIRONMENT']})
+@app.route('/<env>/run_times_chart.json')
+def run_times_chart(env):
+    """Return JSON data for the run time charts on the overview."""
+    result = get_or_abort(
+        get_run_times_chart,
+        db=puppetdb,
+        env=env,
+        days_number=app.config['DAILY_REPORTS_CHART_DAYS'],
+    )
+    return jsonify(result=result)
+
+
+def _format_run_times(day, reports):
+    """Min, max and mean of each run time metric over the reports of a day."""
+    values = {name: [] for name in RUN_TIME_METRICS}
+    for report in reports:
+        for metric in (report.get('metrics') or {}).get('data') or []:
+            if metric.get('category') == 'time' and metric.get('name') in values:
+                values[metric['name']].append(metric['value'])
+    result = {'day': day}
+    for name, seen in values.items():
+        # None leaves a gap in the chart instead of a fake zero
+        result[name] = {
+            'min': round(min(seen), 2) if seen else None,
+            'max': round(max(seen), 2) if seen else None,
+            'avg': round(sum(seen) / len(seen), 2) if seen else None,
+        }
+    return result
+
+
+def get_run_times_chart(db, env, days_number):
+    """Return min, max and mean of the catalog application and fact
+       generation time over all agent reports, per day, for today and the
+       previous N days.
+    """
+    def one_day(day_range):
+        start, end = day_range
+        query = ExtractOperator()
+        query.add_field('metrics')
+        subquery = AndOperator()
+        subquery.add(GreaterEqualOperator('producer_timestamp', start.strftime(DATETIME_FORMAT)))
+        subquery.add(LessOperator('producer_timestamp', end.strftime(DATETIME_FORMAT)))
+        if env != '*':
+            subquery.add(EqualsOperator('environment', env))
+        query.add_query(subquery)
+        return _format_run_times(start.strftime(DATE_FORMAT),
+                                 db._query('reports', query=query))
+
+    with ThreadPoolExecutor(max_workers=min(days_number, 8) or 1) as pool:
+        return list(pool.map(one_day, _iter_dates(days_number, reverse=True)))

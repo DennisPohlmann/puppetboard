@@ -22,6 +22,8 @@ def test_get_index(client, mocker,
     # DataTables drops the second "very" from the class list, so the
     # compact row padding hangs on the extra very-compact class
     assert 'very-compact' in soup.select_one('#main-table')['class']
+    charts = [c['data-metric'] for c in soup.select('.run-times-chart')]
+    assert charts == ['catalog_application', 'fact_generation']
 
 
 def test_index_all(client, mocker,
