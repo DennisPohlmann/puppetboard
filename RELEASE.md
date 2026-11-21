@@ -4,8 +4,10 @@ Releases of this fork are published as `puppetboard-dp` on PyPI and as
 `ghcr.io/dennispohlmann/puppetboard` in the GitHub Container Registry.
 A release needs Dennis' explicit "RELEASE GO" and a passed security gate.
 
-1. Set the new version in [pyproject.toml](pyproject.toml) and describe the changes in
-   [CHANGELOG.md](CHANGELOG.md). Commit both (signed) to `main`.
+1. Set the new version in [pyproject.toml](pyproject.toml), in `version` and `appVersion` of
+   [charts/puppetboard/Chart.yaml](charts/puppetboard/Chart.yaml), in the image tag of
+   `charts/puppetboard/tests/deployment_test.yaml` and in the `--version` of the chart README. Turn
+   "Unreleased" in [CHANGELOG.md](CHANGELOG.md) into the version's section. Commit (signed) to `main`.
 2. Tag the commit with the plain version, without a `v`, and push the tag:
 
    ```shell
