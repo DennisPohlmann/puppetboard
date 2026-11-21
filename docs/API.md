@@ -5,7 +5,7 @@ Puppetboard can serve a read-only JSON API under `/api/v1/` and a read-only
 
 ## JSON API
 
-The API It reads the
+The API reads the
 same PuppetDB data as the web interface and never writes to PuppetDB.
 
 The API has **no authentication of its own**. Run it behind a reverse proxy
