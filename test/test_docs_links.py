@@ -58,3 +58,13 @@ def test_systemd_install_unit_and_selinux_use_the_same_venv():
     assert f"semanage fcontext -a -t usr_t '{venv}(/.*)?'" in section
     assert f"semanage fcontext -a -t bin_t '{venv}/bin(/.*)?'" in section
     assert f'restorecon -RF {venv}\n' in section
+
+
+def test_systemd_setup_files_are_readable_for_the_service_group():
+    # the unit runs as group puppetboard: settings.py and the key must be readable for it, nobody else
+    doc = (ROOT / 'docs' / 'Deployment-setups.md').read_text()
+    section = doc.split('## Python package with gunicorn and systemd', 1)[1].split('\n## ', 1)[0]
+    paths = re.findall(r"^PUPPETDB_(?:SSL_VERIFY|KEY|CERT) = '([^']+)'$", section, re.M)
+    assert len(paths) == 3 and all(p.startswith('/etc/puppetboard/') for p in paths), paths
+    assert 'chgrp puppetboard /etc/puppetboard/settings.py /etc/puppetboard/key.pem\n' in section
+    assert 'chmod 0640 /etc/puppetboard/settings.py /etc/puppetboard/key.pem\n' in section

@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
 - The systemd unit in the deployment docs also sets `Group=puppetboard`, and `useradd --user-group` creates it.
 - The Apache example sends the same proxy headers and 60 s timeout as the nginx one.
 - The SELinux labels in the deployment docs use the venv path of the install, `/opt/puppetboard`.
+- The systemd setup in the deployment docs keeps all PuppetDB files in `/etc/puppetboard` and makes
+  `settings.py` and `key.pem` readable for the group `puppetboard` only.
 
 **Removed**
 

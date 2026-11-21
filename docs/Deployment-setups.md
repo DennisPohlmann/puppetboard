@@ -126,13 +126,21 @@ useradd --system --user-group --home-dir /opt/puppetboard --shell /sbin/nologin 
 ```python
 PUPPETDB_HOST = 'puppetdb.example.com'
 PUPPETDB_PORT = 8081
-PUPPETDB_SSL_VERIFY = '/etc/puppetlabs/puppet/ssl/certs/ca.pem'
+PUPPETDB_SSL_VERIFY = '/etc/puppetboard/ca.pem'
 PUPPETDB_KEY = '/etc/puppetboard/key.pem'
 PUPPETDB_CERT = '/etc/puppetboard/cert.pem'
 SECRET_KEY = 'change-me-to-a-long-random-string'
 ENABLE_API = True
 ENABLE_MCP = True
 MCP_ALLOWED_HOSTS = ['puppetboard.example.com']
+```
+
+`settings.py` holds the `SECRET_KEY` and `key.pem` the private key, so only
+root and the group `puppetboard` may read them:
+
+```bash
+chgrp puppetboard /etc/puppetboard/settings.py /etc/puppetboard/key.pem
+chmod 0640 /etc/puppetboard/settings.py /etc/puppetboard/key.pem
 ```
 
 `/etc/systemd/system/puppetboard.service`:
