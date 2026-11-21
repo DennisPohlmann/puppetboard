@@ -41,7 +41,7 @@ dependencies = [
     "wtforms>=3.3.0,<4",
     "zipp>=3.21,<5.0",
     # ASGI entry point puppetboard.asgi:app with the MCP server
-    "gunicorn>=23,<28",
+    "gunicorn>=24,<28",  # 24.0 brought the native "-k asgi" worker
     "mcp>=2.3.0,<3",
     "a2wsgi>=1.10.10,<2",
 ]

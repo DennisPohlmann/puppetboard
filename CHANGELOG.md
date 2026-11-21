@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 **Fixed**
 
 - The container image reads `QUERY_PRESETS_FILE` from the environment, so saved queries work there too.
+- `pip install puppetboard-dp` requires gunicorn 24 or newer, the first release with the `-k asgi` worker.
 
 **Removed**
 

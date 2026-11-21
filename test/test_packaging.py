@@ -15,6 +15,12 @@ def test_plain_install_brings_asgi_and_mcp():
     assert {'gunicorn', 'mcp', 'a2wsgi'} <= _names(project['dependencies'])
 
 
+def test_gunicorn_floor_has_the_asgi_worker():
+    # '-k asgi' exists since gunicorn 24.0; an older one cannot serve puppetboard.asgi:app
+    deps = tomllib.loads(PYPROJECT.read_text())['project']['dependencies']
+    assert any(dep.replace(' ', '').startswith('gunicorn>=24') for dep in deps)
+
+
 def test_mcp_extra_kept_as_empty_alias():
     project = tomllib.loads(PYPROJECT.read_text())['project']
     assert project['optional-dependencies']['mcp'] == []
@@ -22,7 +28,7 @@ def test_mcp_extra_kept_as_empty_alias():
 
 def test_docs_name_only_the_asgi_entry_point():
     root = PYPROJECT.parent
-    docs = [root / 'README.md', *sorted((root / 'docs').glob('*.md'))]
+    docs = [p for p in root.rglob('*.md') if p.name != 'CHANGELOG.md' and not {'venv', '.venv', 'node_modules', 'dist'} & set(p.parts)]
     for doc in docs:
         text = doc.read_text()
         assert 'puppetboard.app:app' not in text, doc
