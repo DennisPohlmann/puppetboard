@@ -21,7 +21,7 @@ Compose examples.
   queries, `GET` only, described as OpenAPI 3.1 at `/api/v1/openapi.json`.
   [docs/API.md](docs/API.md#json-api)
 - **MCP server** under `/mcp` (`ENABLE_MCP`): Claude and other MCP clients read nodes, facts, reports and
-  catalog resources. Twelve read-only tools that discover your facts first, so no fact of its own is needed.
+  catalog resources. Thirteen read-only tools that discover your facts first, so no fact of its own is needed.
   [docs/MCP.md](docs/MCP.md)
 - **Built along the CIS benchmarks:** API and MCP follow the CIS API Security Guide and the CIS MCP Server
   Benchmark: every parameter validated, paging and result limits, rate limit, audit log, DNS rebinding
