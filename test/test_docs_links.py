@@ -32,3 +32,10 @@ def test_readme_images_are_absolute_for_pypi():
     # PyPI shows README.md without the repository, so relative images break there
     for match in re.finditer(r'!\[[^\]]*\]\(([^)\s]+)\)|<img src="([^"]+)"', (ROOT / 'README.md').read_text()):
         assert (match.group(1) or match.group(2)).startswith('https://'), match.group(0)
+
+
+def test_systemd_unit_sets_user_and_group():
+    # the unit runs as puppetboard:puppetboard, so the documented useradd must create that group
+    doc = (ROOT / 'docs' / 'Deployment-setups.md').read_text()
+    assert re.search(r'^User=puppetboard\nGroup=puppetboard$', doc, re.M)
+    assert re.search(r'^useradd --system --user-group .* puppetboard$', doc, re.M)

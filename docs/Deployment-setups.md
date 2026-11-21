@@ -117,7 +117,7 @@ Python 3.12 or newer, e.g. the system Python of RHEL 10:
 ```bash
 python3 -m venv /opt/puppetboard
 /opt/puppetboard/bin/pip install puppetboard-dp
-useradd --system --home-dir /opt/puppetboard --shell /sbin/nologin puppetboard
+useradd --system --user-group --home-dir /opt/puppetboard --shell /sbin/nologin puppetboard
 ```
 
 `/etc/puppetboard/settings.py` overrides only what differs from
@@ -145,6 +145,7 @@ Wants=network-online.target
 
 [Service]
 User=puppetboard
+Group=puppetboard
 Environment=PUPPETBOARD_SETTINGS=/etc/puppetboard/settings.py
 ExecStart=/opt/puppetboard/bin/gunicorn -k asgi --workers 2 -b 127.0.0.1:8080 puppetboard.asgi:app
 Restart=on-failure
