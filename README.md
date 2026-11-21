@@ -22,7 +22,7 @@ Compose examples.
   [docs/API.md](docs/API.md#json-api)
 - **MCP server** under `/mcp` (`ENABLE_MCP`): Claude and other MCP clients read nodes, facts, reports and
   catalog resources. Twelve read-only tools that discover your facts first, so no fact of its own is needed.
-  [docs/API.md](docs/API.md#mcp-server)
+  [docs/MCP.md](docs/MCP.md)
 - **Built along the CIS benchmarks:** API and MCP follow the CIS API Security Guide and the CIS MCP Server
   Benchmark: every parameter validated, paging and result limits, rate limit, audit log, DNS rebinding
   protection for `/mcp`. Authentication belongs in the reverse proxy in front.
@@ -61,11 +61,15 @@ The full list of changes is in the [CHANGELOG](CHANGELOG.md).
 
 ![Single fact, with graphs](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/fact.png)
 
-**MCP server: Claude asks which nodes failed and why**
+**MCP server: real questions from Claude, answered from PuppetDB** ([docs/MCP.md](docs/MCP.md))
 
-![MCP server answering which nodes failed](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/mcp_failed_nodes.png)
+![MCP: which nodes failed their last Puppet run, and why?](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/mcp_failed_nodes.png)
 
-All views: [docs/Screenshots.md](docs/Screenshots.md). More MCP examples: [docs/API.md](docs/API.md#examples).
+![MCP: which operating system versions do my nodes run, per environment?](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/mcp_os_versions.png)
+
+![MCP: which nodes have not reported to Puppet in the last hour?](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/mcp_unreported.png)
+
+All views: [docs/Screenshots.md](docs/Screenshots.md).
 
 ## Requirements
 
@@ -133,7 +137,8 @@ Every setting: [docs/Configuration.md](docs/Configuration.md).
 |---|---|
 | [docs/Configuration.md](docs/Configuration.md) | all settings, PuppetDB certificates, Puppet agent and PuppetDB configuration |
 | [docs/Deployment-setups.md](docs/Deployment-setups.md) | container, Puppet-managed container, pip with gunicorn and systemd, SELinux on RHEL, nginx and Apache in front |
-| [docs/API.md](docs/API.md) | JSON API endpoints, MCP server and its tools, securing both, CIS benchmark coverage |
+| [docs/API.md](docs/API.md) | JSON API endpoints, securing API and MCP, CIS benchmark coverage |
+| [docs/MCP.md](docs/MCP.md) | MCP server, its settings and tools, example questions |
 | [docker-compose/](docker-compose/) | Compose examples: `standalone` and `proxy` (nginx with TLS and Basic-Auth) |
 | [charts/puppetboard/](charts/puppetboard/README.md) | Helm chart: install from ghcr.io, PuppetDB certificate, all values |
 | [QUERY_PRESETS.md](QUERY_PRESETS.md) | saved queries on the Query page |

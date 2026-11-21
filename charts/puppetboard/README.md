@@ -65,7 +65,7 @@ htpasswd -cB auth admin
 kubectl -n puppetboard create secret generic puppetboard-basic-auth --from-file=auth
 ```
 
-Details on the endpoints, tools and the CIS mapping: [docs/API.md](../../docs/API.md).
+Details on the endpoints and the CIS mapping: [docs/API.md](../../docs/API.md), on the MCP tools: [docs/MCP.md](../../docs/MCP.md).
 
 ## Values
 

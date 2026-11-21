@@ -19,4 +19,4 @@ docker compose -f docker-compose.yml -f ../standalone/docker-compose.build.yml u
 ```
 
 All settings are described in the [docs/Configuration.md](../docs/Configuration.md#app-settings) and,
-for API and MCP, in [docs/API.md](../docs/API.md).
+for API and MCP, in [docs/API.md](../docs/API.md) and [docs/MCP.md](../docs/MCP.md).

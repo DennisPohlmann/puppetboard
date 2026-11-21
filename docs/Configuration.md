@@ -127,7 +127,7 @@ Other settings that might be interesting, in no particular order:
 - `ENABLE_API`: If set to `True` serves the read-only JSON API under `/api/v1/`. Defaults to `False`.
     See [docs/API.md](API.md) for the endpoints and the `API_*` settings.
 - `ENABLE_MCP`: If set to `True` serves a read-only MCP server under `/mcp`.
-    Needs `MCP_ALLOWED_HOSTS`. Defaults to `False`. See [docs/API.md](API.md).
+    Needs `MCP_ALLOWED_HOSTS`. Defaults to `False`. See [docs/MCP.md](MCP.md).
 - `ENABLE_CLASS`: If set to `True` allows the user to view the number of resource events (number of changed resources in the last report) grouped by class.
     The resource events are grouped by their status ('failure', 'success', 'noop').
 - `CLASS_EVENTS_STATUS_COLUMNS`: A mapping between the status of the resource events and the name of the columns of the table to display.
