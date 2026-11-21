@@ -20,6 +20,8 @@ ENABLE_API = False
 API_DEFAULT_LIMIT = 100
 API_MAX_LIMIT = 1000
 API_MAX_QUERY_LENGTH = 4096
+# Scalar API reference of openapi.json on /api/v1/docs (needs ENABLE_API)
+API_DOCS = True
 # Requests per minute and client IP for /api/ and /mcp, 0 disables the limit
 API_RATE_LIMIT = 120
 # Read-only MCP server on /mcp, only when served by puppetboard.asgi:app.

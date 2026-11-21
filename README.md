@@ -18,7 +18,7 @@ Compose examples.
 ## What this fork adds
 
 - **Read-only JSON API** under `/api/v1/` (`ENABLE_API`): nodes, facts, reports, catalog resources and PQL
-  queries, `GET` only, described as OpenAPI 3.1 at `/api/v1/openapi.json`.
+  queries, `GET` only, described as OpenAPI 3.1 at `/api/v1/openapi.json` and browsable at `/api/v1/docs`.
   [docs/API.md](docs/API.md#json-api)
 - **MCP server** under `/mcp` (`ENABLE_MCP`): Claude and other MCP clients read nodes, facts, reports and
   catalog resources. Thirteen read-only tools that discover your facts first, so no fact of its own is needed.

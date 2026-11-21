@@ -78,6 +78,12 @@ Real `curl` calls and their answers, see [API.md](API.md#examples).
 
 ![A PQL query for the status of all database nodes](../screenshots/api_pql.png)
 
+The API reference on `/api/v1/docs`, see [API.md](API.md#api-reference).
+
+![API reference, light theme](../screenshots/api_docs.png)
+
+![API reference, dark theme on a phone](../screenshots/api_docs_dark_phone.png)
+
 ## MCP server
 
 Claude Code connected to `/mcp`, with the tool calls it made, see [MCP.md](MCP.md#examples).

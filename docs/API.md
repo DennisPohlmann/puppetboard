@@ -20,6 +20,7 @@ see [Securing API and MCP](#securing-api-and-mcp).
 | `API_DEFAULT_LIMIT` | `API_DEFAULT_LIMIT` | `100` | Page size when `limit` is not given. |
 | `API_MAX_LIMIT` | `API_MAX_LIMIT` | `1000` | Largest allowed `limit`, also caps PQL results (after PuppetDB returned them, so a broad query still costs worker memory). |
 | `API_MAX_QUERY_LENGTH` | `API_MAX_QUERY_LENGTH` | `4096` | Longest accepted PQL query. |
+| `API_DOCS` | `API_DOCS` | `True` | Serve the API reference on `/api/v1/docs` (only with `ENABLE_API`). |
 | `API_RATE_LIMIT` | `API_RATE_LIMIT` | `120` | Requests per minute and client IP (API and MCP), `0` turns it off. Counted per worker process. |
 | `ENABLE_QUERY` | `ENABLE_QUERY` | `True` | Also gates `/api/v1/query` (and `ENABLED_QUERY_ENDPOINTS` must contain `pql`). PQL reads every PuppetDB entity, catalogs and resource parameters included, regardless of `ENABLE_CATALOG`. |
 | `ENABLE_CATALOG` | `ENABLE_CATALOG` | `False` | Also gates `/api/v1/nodes/<certname>/resources`; resource parameters can hold secrets. |
@@ -28,6 +29,26 @@ see [Securing API and MCP](#securing-api-and-mcp).
 
 The machine-readable description is served at `/api/v1/openapi.json`
 (OpenAPI 3.1). All endpoints are `GET` only.
+
+### API reference
+
+`/api/v1/docs` shows the same document as a browsable reference, rendered by
+[Scalar](https://github.com/scalar/scalar) (MIT). It follows Puppetboard's
+light or dark theme and is locked down:
+
+* Scalar is shipped in `puppetboard/static/libs/scalar/`; the page loads
+  nothing from other hosts (no CDN, no fonts, no telemetry).
+* No "Test Request" button, no API client, no AI agent, no MCP generator:
+  the page only reads `openapi.json`.
+* `Content-Security-Policy` allows scripts, styles and requests from the own
+  origin only (`style-src` also needs `'unsafe-inline'` for Scalar's
+  generated styles), `frame-ancestors 'none'`, `Referrer-Policy: no-referrer`.
+* Like every API URL it sits behind `ENABLE_API`, the rate limit, the audit
+  log and your reverse proxy. `API_DOCS = False` turns it off (404).
+
+![API reference, light theme](../screenshots/api_docs.png)
+
+![API reference, dark theme on a phone](../screenshots/api_docs_dark_phone.png)
 
 | Endpoint | Returns |
 |---|---|
@@ -106,7 +127,7 @@ MCP benchmark 2.2, 2.3, 3.1, 3.3) are delegated to the reverse proxy by design.
 
 | Rule | How |
 |---|---|
-| API 1.1 documentation, single source of truth | OpenAPI 3.1 at `/api/v1/openapi.json`, this page. |
+| API 1.1 documentation, single source of truth | OpenAPI 3.1 at `/api/v1/openapi.json`, rendered from it on `/api/v1/docs`, this page. |
 | API 2.2.3 request validation | Every path and query parameter is checked against a pattern or range before PuppetDB is asked. |
 | API 2.2.4 response control | Paging with an upper bound, PQL results capped at `API_MAX_LIMIT`, `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`. |
 | API 2.2.5 rate limiting | `API_RATE_LIMIT` per client IP. |

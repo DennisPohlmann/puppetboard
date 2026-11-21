@@ -173,3 +173,41 @@ def test_openapi(api_client):
 
 def test_audit_log_cannot_be_forged():
     assert api.log_safe('a\r\nfake line\\') == 'a\\r\\nfake line\\\\'
+
+
+def test_index_links_docs(api_client):
+    assert api_client.get('/api/v1/').json['data']['docs'].endswith('/api/v1/docs')
+
+
+def test_docs_page_is_local_and_locked_down(api_client):
+    rv = api_client.get('/api/v1/docs')
+    assert rv.status_code == 200
+    html = rv.get_data(as_text=True)
+    assert '/static/libs/scalar/standalone.js' in html
+    assert 'data-openapi="/api/v1/openapi.json"' in html
+    assert 'http://' not in html and 'https://' not in html
+    csp = rv.headers['Content-Security-Policy']
+    assert "script-src 'self';" in csp and "connect-src 'self';" in csp
+    assert "frame-ancestors 'none'" in csp and 'http' not in csp
+    assert rv.headers['Cache-Control'] == 'no-store'
+
+
+def test_docs_assets_are_shipped(client):
+    assert client.get('/static/libs/scalar/standalone.js').status_code == 200
+    js = client.get('/static/js/api-docs.js').get_data(as_text=True)
+    for option in ('hideTestRequestButton: true', 'hideClientButton: true', 'telemetry: false',
+                   'withDefaultFonts: false', 'agent: { disabled: true }'):
+        assert option in js
+
+
+def test_docs_can_be_turned_off(api_client):
+    app.app.config['API_DOCS'] = False
+    try:
+        assert api_client.get('/api/v1/docs').status_code == 404
+        assert 'docs' not in api_client.get('/api/v1/').json['data']
+    finally:
+        app.app.config['API_DOCS'] = True
+
+
+def test_docs_need_the_api(client):
+    assert client.get('/api/v1/docs').status_code == 404

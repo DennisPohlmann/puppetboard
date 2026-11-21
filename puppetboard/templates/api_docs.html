@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config.PAGE_TITLE }} API</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml"/>
+  </head>
+  <body>
+    <div id="api-docs" data-openapi="{{ url_for('api.openapi') }}"></div>
+    <script src="{{ url_for('static', filename='libs/scalar/standalone.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api-docs.js') }}"></script>
+  </body>
+</html>

@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
   and the last days.
 - MCP tool `get_current_time` and server instructions that explain the UTC timestamps and which come from the
   agent's clock, so assistants no longer report Puppet runs "in the future".
+- API reference on `/api/v1/docs`: [Scalar](https://github.com/scalar/scalar) 1.77.0 renders `openapi.json`,
+  shipped with Puppetboard (no CDN, no external fonts, no telemetry, no request sending, strict CSP).
+  `API_DOCS = False` turns it off.
 
 **Changed**
 

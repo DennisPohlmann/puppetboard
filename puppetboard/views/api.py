@@ -8,7 +8,8 @@ import os
 import time
 from datetime import datetime, timezone
 
-from flask import Blueprint, abort, g, jsonify, request, send_from_directory
+from flask import (Blueprint, abort, g, jsonify, render_template, request,
+                   send_from_directory)
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 from werkzeug.exceptions import HTTPException
 
@@ -96,12 +97,30 @@ def args_page():
 
 @api.route('/')
 def index():
-    return jsonify({'data': {'openapi': request.base_url + 'openapi.json'}})
+    links = {'openapi': request.base_url + 'openapi.json'}
+    if app.config['API_DOCS']:
+        links['docs'] = request.base_url + 'docs'
+    return jsonify({'data': links})
 
 
 @api.route('/openapi.json')
 def openapi():
     return send_from_directory(STATIC, 'openapi.json', mimetype='application/json')
+
+
+@api.route('/docs')
+def docs():
+    """Scalar reference of openapi.json, all assets local, no request sending."""
+    if not app.config['API_DOCS']:
+        abort(404)
+    response = app.make_response(render_template('api_docs.html'))
+    # Scalar's Vue components inject <style> tags, hence 'unsafe-inline' for styles only
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; font-src 'self' data:; connect-src 'self'; "
+        "base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
+    response.headers['Referrer-Policy'] = 'no-referrer'
+    return response
 
 
 @api.route('/nodes')

@@ -71,6 +71,7 @@ ENABLE_API = coerce_bool(os.getenv('ENABLE_API'), False)
 API_DEFAULT_LIMIT = int(os.getenv('API_DEFAULT_LIMIT', '100'))
 API_MAX_LIMIT = int(os.getenv('API_MAX_LIMIT', '1000'))
 API_MAX_QUERY_LENGTH = int(os.getenv('API_MAX_QUERY_LENGTH', '4096'))
+API_DOCS = coerce_bool(os.getenv('API_DOCS'), True)
 API_RATE_LIMIT = int(os.getenv('API_RATE_LIMIT', '120'))
 ENABLE_MCP = coerce_bool(os.getenv('ENABLE_MCP'), False)
 MCP_ALLOWED_HOSTS = [x.strip() for x in os.getenv('MCP_ALLOWED_HOSTS', '').split(',') if x.strip()]
