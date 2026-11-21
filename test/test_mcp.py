@@ -1,12 +1,13 @@
 import asyncio
 import json
+from datetime import datetime, timezone
 
 import pytest
 from mcp import Client
 from requests.exceptions import ConnectionError
 
 from puppetboard import app
-from puppetboard.mcp_server import McpEndpoint, create_server
+from puppetboard.mcp_server import INSTRUCTIONS, McpEndpoint, create_server
 
 CONFIG = dict(app.app.config, MCP_ALLOWED_HOSTS=['puppetboard.test'], MCP_ALLOWED_ORIGINS=[],
               MCP_MAX_REQUEST_BODY=1024, API_RATE_LIMIT=0, ENABLE_QUERY=True,
@@ -171,3 +172,15 @@ def test_forwarded_client_uses_last_hop_over_all_header_lines():
                                                     (b'x-forwarded-for', b'203.0.113.7')]}
     assert forwarded_client(scope) == '203.0.113.7'
     assert forwarded_client({'client': ('10.0.0.1', 1), 'headers': []}) == '10.0.0.1'
+
+
+def test_get_current_time_is_utc_now():
+    result = call('get_current_time', {})
+    assert not result.is_error
+    utc = json.loads(result.content[0].text)['utc']
+    now = datetime.strptime(utc, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    assert abs((datetime.now(timezone.utc) - now).total_seconds()) < 5
+
+
+def test_instructions_explain_timestamps():
+    assert 'get_current_time' in INSTRUCTIONS and 'UTC' in INSTRUCTIONS

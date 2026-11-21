@@ -37,7 +37,12 @@ Example: installed packages are only in facts if a module provides such a
 fact; search for 'package' to find it. Packages that Puppet manages are also
 catalog resources of type 'package' (list_node_resources, if enabled).
 Node status: failed, changed, unchanged, noop or unreported. Use small limits
-and page with offset instead of fetching everything at once."""
+and page with offset instead of fetching everything at once.
+All timestamps are UTC (ISO 8601, 'Z'). Call get_current_time for "now"
+before you judge how old a run is; do not assume the date. start_time,
+end_time and producer_timestamp come from the agent's clock, receive_time
+from PuppetDB's: a run that seems to lie in the future, or a producer_timestamp
+after receive_time, means that agent's clock is ahead."""
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True,
                             open_world_hint=False)
@@ -69,6 +74,11 @@ def create_server(config):
 
     def tool(fn):
         return server.tool(annotations=READ_ONLY)(tool_errors(fn))
+
+    @tool
+    def get_current_time() -> dict:
+        """Current time of the Puppetboard server in UTC, to compare timestamps with."""
+        return {'utc': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}
 
     @tool
     def list_environments() -> list[str]:

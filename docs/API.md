@@ -105,6 +105,7 @@ All tools are read-only and marked so (`readOnlyHint`).
 
 | Tool | What it does |
 |---|---|
+| `get_current_time` | Current UTC time of the Puppetboard server, so the assistant can tell how old a run is. |
 | `list_environments` | Puppet environments. |
 | `list_nodes` | Active nodes with status, filter by `status` and `environment`. |
 | `get_node` | Status and timestamps of one node. |
@@ -117,6 +118,11 @@ All tools are read-only and marked so (`readOnlyHint`).
 | `get_report` | One report with logs, metrics and events. |
 | `list_node_resources` | Catalog resources of a node, e.g. type `package`, only with `ENABLE_CATALOG`. |
 | `run_pql` | Any PQL query, only with `ENABLE_QUERY`. |
+
+All timestamps are UTC as PuppetDB delivers them (`2026-11-21T12:30:00.000Z`),
+whatever time zone the nodes run in. `start_time`, `end_time` and
+`producer_timestamp` of a report come from the agent's clock, `receive_time`
+from PuppetDB. A run "in the future" means that agent's clock is ahead.
 
 Puppetboard does not add a fact of its own. Facts differ from site to site,
 so the server tells the assistant to discover them first (`search_fact_names`,
