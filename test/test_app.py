@@ -167,7 +167,8 @@ def test_environment_menu_shows_long_names_as_tooltip(client, mocker, mock_puppe
 
 def test_environment_menu_title_for_all_environments(client, mock_puppetdb_environments,
                                                      mock_puppetdb_default_nodes):
-    soup = BeautifulSoup(client.get('/nodes').data, 'html.parser')
+    # '*' is the "All Environments" entry; '/nodes' would use DEFAULT_ENVIRONMENT
+    soup = BeautifulSoup(client.get('/*/nodes').data, 'html.parser')
     assert soup.find('div', class_='select-environment')['title'] == 'All Environments'
 
 
