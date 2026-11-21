@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## [9.0.0](https://github.com/DennisPohlmann/puppetboard/tree/9.0.0) (2026-11-21)
 
 **Added**
 
@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file.
   and the last days.
 - MCP tool `get_current_time` and server instructions that explain the UTC timestamps and which come from the
   agent's clock, so assistants no longer report Puppet runs "in the future".
+
+**Changed**
+
+- Updated certifi to 2026.11.20, pydantic to 2.14.4, pydantic_core to 2.50.5 and PyYAML to 6.0.4.
 
 **Fixed**
 
@@ -28,7 +32,7 @@ All notable changes to this project will be documented in this file.
 
 **Removed**
 
-- WSGI is no longer supported: `puppetboard.asgi:app` (`gunicorn -k asgi`) is the only entry point. Setups with
+- **Breaking:** WSGI is no longer supported: `puppetboard.asgi:app` (`gunicorn -k asgi`) is the only entry point. Setups with
   Apache mod_wsgi or `gunicorn puppetboard.app:app` switch to it, see [docs/Deployment-setups.md](docs/Deployment-setups.md).
 
 ## [8.2.1](https://github.com/DennisPohlmann/puppetboard/tree/8.2.1) (2026-11-19)
