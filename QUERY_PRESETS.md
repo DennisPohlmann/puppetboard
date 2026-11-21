@@ -8,17 +8,20 @@ The Query Presets feature allows users to save and quickly load frequently-used 
 
 ### 1. Enable Query Presets
 
-In your Puppetboard configuration file (e.g., `local_settings.py` or `docker_settings.py`), set the path to your presets file:
+In your settings file (the one `PUPPETBOARD_SETTINGS` points to), set the path to your presets file:
 
 ```python
 QUERY_PRESETS_FILE = '/etc/puppetboard/query_presets.yaml'
 ```
 
-Set to `None` to disable presets:
+In the container image, the Helm chart or Compose, set the environment variable instead and mount the file
+read-only:
 
-```python
-QUERY_PRESETS_FILE = None  # Presets disabled
+```bash
+QUERY_PRESETS_FILE=/etc/puppetboard/query_presets.yaml
 ```
+
+Without the setting (the default) the Query page shows no presets.
 
 ### 2. Create a Presets File
 
@@ -211,7 +214,7 @@ To convert frequently-used manual queries to presets:
 1. Execute the query normally in the Query tab
 2. Once it works, copy the query text
 3. Add it to your presets YAML file with a descriptive name
-4. Reload Puppetboard to see the new preset
+4. Reload the Query page: the file is read on every page load, no restart needed
 
 ## See Also
 
