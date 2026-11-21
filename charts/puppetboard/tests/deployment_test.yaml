@@ -67,6 +67,9 @@ tests:
           content: {name: ENABLE_API, value: "false"}
       - contains:
           path: spec.template.spec.containers[0].env
+          content: {name: API_DOCS, value: "true"}
+      - contains:
+          path: spec.template.spec.containers[0].env
           content: {name: ENABLE_MCP, value: "false"}
   - it: MCP takes its allowed hosts from the ingress and the HTTPRoute
     set:

@@ -85,6 +85,8 @@ spec:
               value: {{ .Values.api.enabled | quote }}
             - name: API_RATE_LIMIT
               value: {{ .Values.api.rateLimit | quote }}
+            - name: API_DOCS
+              value: {{ .Values.api.docs | quote }}
             - name: ENABLE_MCP
               value: {{ .Values.mcp.enabled | quote }}
             {{- if .Values.mcp.enabled }}

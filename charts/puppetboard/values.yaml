@@ -71,6 +71,8 @@ api:
   enabled: false
   # -- Requests per minute and client (API and MCP each), 0 = off.
   rateLimit: 120
+  # -- Scalar API reference under /api/v1/docs (only with enabled).
+  docs: true
 
 mcp:
   # -- Read-only MCP server under /mcp. No authentication of its own: only

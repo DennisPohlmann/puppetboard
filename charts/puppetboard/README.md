@@ -80,6 +80,7 @@ Details on the endpoints and the CIS mapping: [docs/API.md](../../docs/API.md), 
 | `puppetdb.tls.enabled` | `true` | Use a client certificate. |
 | `puppetdb.tls.existingSecret` | – | Secret with `ca.crt`, `tls.crt`, `tls.key`; or `ca`/`cert`/`key` as PEM text. |
 | `api.enabled` / `api.rateLimit` | `false` / `120` | JSON API under `/api/v1/`, requests per minute and client. |
+| `api.docs` | `true` | API reference under `/api/v1/docs` (only with `api.enabled`). |
 | `mcp.enabled` | `false` | MCP server under `/mcp`. |
 | `mcp.allowedHosts` / `.allowedOrigins` | ingress/httpRoute hosts / – | Host and Origin headers accepted on `/mcp`. |
 | `config` | see values.yaml | Further settings as environment variables, names as in the [docs/Configuration.md](../../docs/Configuration.md#app-settings). |

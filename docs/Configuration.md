@@ -97,7 +97,7 @@ SECRET_KEY = 'output of: openssl rand -hex 32'
 | `ENABLED_QUERY_ENDPOINTS` | all | PuppetDB endpoints the Query page may use, e.g. `['facts', 'nodes']`; names in `QUERY_ENDPOINTS` of `puppetboard/forms.py`. Not available in the container. |
 | `QUERY_PRESETS_FILE` | `None` | YAML file with saved queries for the Query page, see [QUERY_PRESETS.md](../QUERY_PRESETS.md). |
 | `ENABLE_CATALOG` | `False` | Catalog of a node (resources, files, relationships), also catalog resources in API and MCP. |
-| `ENABLE_API` | `False` | Read-only JSON API under `/api/v1/`; its `API_*` settings are in [API.md](API.md#api-settings). |
+| `ENABLE_API` | `False` | Read-only JSON API under `/api/v1/`; its `API_*` settings, among them `API_DOCS` for the reference on `/api/v1/docs`, are in [API.md](API.md#api-settings). |
 | `ENABLE_MCP` | `False` | Read-only MCP server under `/mcp`, needs `MCP_ALLOWED_HOSTS`; its `MCP_*` settings are in [MCP.md](MCP.md#mcp-settings). |
 
 ### Classes view

@@ -119,6 +119,9 @@
         "rateLimit": {
           "type": "integer",
           "minimum": 0
+        },
+        "docs": {
+          "type": "boolean"
         }
       }
     },
