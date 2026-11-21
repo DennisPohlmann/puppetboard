@@ -38,6 +38,8 @@ Compose examples.
   and nginx or Apache in front are in [docs/Deployment-setups.md](docs/Deployment-setups.md).
 - **Security fixes:** stored and reflected XSS through node data and URL parameters closed on every page;
   forged audit log lines and spoofed client addresses for the rate limit prevented.
+- **Run times on the overview:** charts of the fastest, slowest and average catalog application and fact
+  generation time per day, and a switch for all overview charts between the last 24 hours and the last days.
 - **Faster with many nodes:** quicker facts overview, failures, inventory, nodes and daily chart; the
   environment list is cached for 60 seconds.
 - **Current libraries:** DataTables, Fomantic-UI, jQuery, billboard.js and the Python dependencies kept up
