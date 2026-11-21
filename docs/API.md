@@ -62,13 +62,21 @@ List endpoints take `limit` and `offset` and answer
 | 429 | Rate limit hit, see the `Retry-After` header. |
 | 502 | PuppetDB not reachable or failing. |
 
-Examples:
+### Examples
 
 ```bash
 curl -u user:pass https://puppetboard.example.com/api/v1/nodes?status=failed
 curl -u user:pass https://puppetboard.example.com/api/v1/nodes/web01.example.com/facts?name=os
 curl -u user:pass -G https://puppetboard.example.com/api/v1/query --data-urlencode 'pql=nodes[certname] { facts { name = "kernel" and value = "Linux" } }'
 ```
+
+Real calls against a test instance and the answers it gave:
+
+![Nodes that failed their last run](../screenshots/api_failed_nodes.png)
+
+![Two facts of one node](../screenshots/api_node_facts.png)
+
+![A PQL query for the status of all database nodes](../screenshots/api_pql.png)
 
 ## MCP server
 

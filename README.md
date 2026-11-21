@@ -69,6 +69,14 @@ The full list of changes is in the [CHANGELOG](CHANGELOG.md).
 
 ![MCP: which nodes have not reported to Puppet in the last hour?](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/mcp_unreported.png)
 
+**JSON API: real `curl` calls and their answers** ([docs/API.md](docs/API.md#examples))
+
+![API: nodes that failed their last run](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/api_failed_nodes.png)
+
+![API: two facts of one node](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/api_node_facts.png)
+
+![API: a PQL query for the status of all database nodes](https://raw.githubusercontent.com/DennisPohlmann/puppetboard/main/screenshots/api_pql.png)
+
 All views: [docs/Screenshots.md](docs/Screenshots.md).
 
 ## Requirements
