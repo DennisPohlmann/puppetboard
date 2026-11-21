@@ -84,7 +84,7 @@ jQuery(function ($) {
         colors: getChartColors(),
       },
       size: {
-        height: splitMode ? 220 : 160,
+        height: splitMode ? 200 : 130,
       },
       point: splitMode ? {
         r: 3,

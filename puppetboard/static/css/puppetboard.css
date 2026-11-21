@@ -891,7 +891,7 @@ h1.ui.header.no-margin-bottom {
 }
 
 #dailyReportsChartContainer {
-  min-height: 160px;
+  min-height: 130px;
 }
 
 .daily-reports-chart-toolbar {
@@ -901,13 +901,22 @@ h1.ui.header.no-margin-bottom {
   margin-bottom: 0.75rem;
 }
 
-#runTimesChartContainer > .daily-reports-chart-toolbar {
-  padding-bottom: 1.5rem;
+/* keep the charts tight so the node list starts high on the page */
+#dailyReportsChartContainer {
+  padding-bottom: 0;
+}
+
+#runTimesChartContainer {
+  padding-top: 0.5rem;
+  padding-bottom: 0;
+}
+
+.ui.header.run-times-title {
+  margin: 0;
 }
 
 .daily-reports-chart-mode-toggle .button.active,
-.daily-reports-chart-range-toggle .button.active,
-.run-times-range-toggle .button.active {
+.daily-reports-chart-range-toggle .button.active {
   background: var(--color-darkblue);
   color: #fff;
 }

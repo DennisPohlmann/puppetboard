@@ -4,8 +4,9 @@ jQuery(function ($) {
     return;
   }
 
-  const rangeButtons = $(".run-times-range-toggle button");
-  const rangeStorageKey = "runTimesChartRange";
+  // one range switch for all overview charts, the one above the daily chart
+  const rangeButtons = $(".daily-reports-chart-range-toggle button");
+  const rangeStorageKey = "dailyReportsChartRange";
   let range = localStorage.getItem(rangeStorageKey) || "days";
 
   function getColors() {
@@ -31,17 +32,18 @@ jQuery(function ($) {
         type: "line",
         colors: getColors(),
       },
-      size: {height: 200},
+      size: {height: 120},
       line: {connectNull: false},
       axis: {
-        // MM-DD keeps the labels on one line on phones; hours are UTC, shown in local time,
-        // upright only where 24 flat ones do not fit (about 50px each)
+        // MM-DD keeps the labels on one line on phones; hours are UTC, shown in local time
+        // hours as "HH" stay flat down to about 20px each
         x: {type: "category", tick: {format: function (index, label) {
-          return range === "today" ? moment(label).format("HH:mm") : label.slice(5);
-        }, culling: false, rotate: range === "today" && $(element).width() < 24 * 50 ? -90 : 0, multiline: false}},
+          return range === "today" ? moment(label).format("HH") : label.slice(5);
+        }, culling: false, rotate: range === "today" && $(element).width() < 24 * 20 ? -90 : 0, multiline: false}},
         y: {
           min: 0,
           padding: {bottom: 0},
+          tick: {culling: {max: 4}},
           label: {text: "Seconds", position: "outer-middle"},
         },
       },
@@ -57,8 +59,6 @@ jQuery(function ($) {
   }
 
   function load() {
-    rangeButtons.removeClass("active");
-    rangeButtons.filter("[data-range-value='" + range + "']").addClass("active");
     $.getJSON("run_times_chart.json?range=" + range, function (data) {
       charts.each(function () {
         render(this, data.result);
@@ -68,7 +68,6 @@ jQuery(function ($) {
 
   rangeButtons.on("click", function () {
     range = $(this).data("range-value");
-    localStorage.setItem(rangeStorageKey, range);
     load();
   });
 

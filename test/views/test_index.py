@@ -28,8 +28,8 @@ def test_get_index(client, mocker,
     scripts = [t['src'] for t in soup.select('script[src]')]
     assert scripts.count('/static/js/dailychart.js') == 1
     assert scripts.count('/static/js/runtimes.js') == 1
-    for toggle in ('.daily-reports-chart-range-toggle', '.run-times-range-toggle'):
-        assert [b['data-range-value'] for b in soup.select(toggle + ' button')] == ['today', 'days']
+    # one range switch drives the daily chart and the run time charts
+    assert [b['data-range-value'] for b in soup.select('[data-range-value]')] == ['today', 'days']
 
 
 def test_index_all(client, mocker,
