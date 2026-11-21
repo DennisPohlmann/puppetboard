@@ -11,8 +11,8 @@ just connects to an existing PuppetDB with host, port and a client certificate.
 Each folder has a `docker-compose.yml`, an `.env.example` with the settings
 (copy it to `.env`) and a README. They work with `docker compose` and
 `podman-compose`. The image is `ghcr.io/dennispohlmann/puppetboard`; it runs
-as the unprivileged user `puppetboard` (uid 10001) on port 8080 with a
-read-only root file system. To build it from the checkout instead:
+as the unprivileged user `puppetboard` (uid 10001) on port 8080, and the
+examples give it a read-only root file system. To build it from the checkout instead:
 
 ```bash
 docker compose -f docker-compose.yml -f ../standalone/docker-compose.build.yml up -d --build
