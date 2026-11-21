@@ -62,7 +62,7 @@
         href="{{ url_for(endpoint, env=current_env) }}">{{ caption }}</a>
       {%- endfor %}
       <div class="right menu">
-        <div class="ui item search very long dropdown selection select-environment">
+        <div class="ui item search very long dropdown selection select-environment" title="{{ 'All Environments' if current_env == '*' else current_env }}">
           <input type="hidden" name="environment" value="{{ url_for_field('env', current_env) }}">
           <i class="dropdown icon"></i>
           <div class="default text">Select Environment</div>
@@ -71,7 +71,7 @@
             {%- if env.divider %}
             <div class="divider"></div>
             {%- endif %}
-            <div class="item" data-value="{{env.url}}"><i class="{{env.icon}} icon"></i>{{ env_name }}</div>
+            <div class="item" data-value="{{env.url}}" title="{{ env_name }}"><i class="{{env.icon}} icon"></i>{{ env_name }}</div>
             {%- endfor %}
           </div>
         </div>

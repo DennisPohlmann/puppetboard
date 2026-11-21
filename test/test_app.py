@@ -149,3 +149,36 @@ def test_status_column_shrinks_on_desktop_only():
            / 'puppetboard.css').read_text()
     media = css.split('@media only screen and (min-width: 768px) {\n  #main-table')[1]
     assert 'white-space: nowrap' in media.split('\n}\n')[0]
+
+
+LONG_ENV = 'feature_JIRA_12345_rework_the_hiera_hierarchy_for_all_datacenters_and_cloud_regions'
+
+
+def test_environment_menu_shows_long_names_as_tooltip(client, mocker, mock_puppetdb_default_nodes):
+    mocker.patch.object(app.puppetdb, 'environments',
+                        return_value=[{'name': 'production'}, {'name': LONG_ENV}])
+    soup = BeautifulSoup(client.get(f'/{LONG_ENV}/nodes').data, 'html.parser')
+    menu = soup.find('div', class_='select-environment')
+    # the box cuts the current name with an ellipsis, the tooltip keeps it whole
+    assert menu['title'] == LONG_ENV
+    assert [i['title'] for i in menu.find_all('div', class_='item')] == [
+        'All Environments', 'production', LONG_ENV]
+
+
+def test_environment_menu_title_for_all_environments(client, mock_puppetdb_environments,
+                                                     mock_puppetdb_default_nodes):
+    soup = BeautifulSoup(client.get('/nodes').data, 'html.parser')
+    assert soup.find('div', class_='select-environment')['title'] == 'All Environments'
+
+
+def test_environment_menu_css_keeps_long_names_in_view():
+    css = (Path(__file__).parent.parent / 'puppetboard' / 'static' / 'css'
+           / 'puppetboard.css').read_text()
+    box = css.split('.ui.select-environment.dropdown {')[1].split('}')[0]
+    assert 'max-width: 22em' in box
+    text = css.split('.ui.select-environment.selection.dropdown > .text {')[1].split('}')[0]
+    assert 'text-overflow: ellipsis' in text
+    menu = css.split('.ui.select-environment.selection.dropdown .menu {\n  left')[1].split('}')[0]
+    assert '100vw' in menu
+    item = css.split('.ui.select-environment.selection.dropdown .menu > .item {')[1].split('}')[0]
+    assert 'overflow-wrap: anywhere' in item
