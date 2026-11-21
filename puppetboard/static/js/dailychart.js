@@ -100,9 +100,9 @@ jQuery(function ($) {
           type: "category",
           tick: {
             format: xTick,
-            // every hour gets a label; turned upright so 24 of them fit on a phone
+            // every hour gets a label; upright only where 24 flat ones do not fit (about 50px each)
             culling: false,
-            rotate: range === "today" ? -90 : 0,
+            rotate: range === "today" && $("#dailyReportsChartContainer").width() < 24 * 50 ? -90 : 0,
             multiline: range !== "today",
           },
         },
