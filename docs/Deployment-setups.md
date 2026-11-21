@@ -33,8 +33,9 @@ The same command works with rootless Podman.
 
 ### Managed by Puppet
 
-With the [puppetlabs/docker](https://forge.puppet.com/modules/puppetlabs/docker) module Puppet can run the container,
-here on the PuppetDB host:
+With the [puppetlabs/docker](https://forge.puppet.com/modules/puppetlabs/docker) module Puppet can run the
+container. On the PuppetDB host it reaches PuppetDB's plain HTTP port on
+127.0.0.1 and listens on 127.0.0.1:8088 for the reverse proxy:
 
 ```puppet
 include docker
@@ -46,6 +47,7 @@ docker::run { 'puppetboard':
   env   => [
     'PUPPETDB_HOST=127.0.0.1',
     'PUPPETDB_PORT=8080',
+    'PUPPETBOARD_HOST=127.0.0.1',
     'PUPPETBOARD_PORT=8088',
     'SECRET_KEY=XXXXXXXX',
   ],
@@ -53,21 +55,31 @@ docker::run { 'puppetboard':
 }
 ```
 
-If you want to have all features enabled, you must use SSL talking to PuppetDB:
+With TLS to PuppetDB, which a remote PuppetDB requires, the container reads
+the agent's own certificate. The key must be readable for the container user
+(uid 10001) only:
 
 ```puppet
+$certname = $trusted['certname']
+
 file { '/etc/puppetboard':
   ensure => directory,
 }
-file { '/etc/puppetboard/key.pem':
+file { '/etc/puppetboard/ca.pem':
   ensure => file,
   mode   => '0644',
-  source => "/etc/puppetlabs/puppet/ssl/private_keys/${facts['networking']['fqdn']}.pem",
+  source => '/etc/puppetlabs/puppet/ssl/certs/ca.pem',
 }
 file { '/etc/puppetboard/cert.pem':
   ensure => file,
   mode   => '0644',
-  source => "/etc/puppetlabs/puppet/ssl/certs/${facts['networking']['fqdn']}.pem",
+  source => "/etc/puppetlabs/puppet/ssl/certs/${certname}.pem",
+}
+file { '/etc/puppetboard/key.pem':
+  ensure => file,
+  owner  => 10001,
+  mode   => '0400',
+  source => "/etc/puppetlabs/puppet/ssl/private_keys/${certname}.pem",
 }
 
 include docker
@@ -78,22 +90,23 @@ docker::run { 'puppetboard':
   image   => 'ghcr.io/dennispohlmann/puppetboard',
   volumes => ['/etc/puppetboard:/etc/puppetboard:ro'],
   env     => [
-    'PUPPETDB_HOST=puppet', # this must be the certname or DNS_ALT_NAME of the PuppetDB host
+    'PUPPETDB_HOST=puppet.example.com', # certname or DNS alt name of the PuppetDB host
     'PUPPETDB_PORT=8081',
-    'PUPPETBOARD_PORT=8080',
-    'ENABLE_CATALOG=true',
-    'PUPPETDB_SSL_VERIFY=false',
+    'PUPPETBOARD_HOST=127.0.0.1',
+    'PUPPETBOARD_PORT=8088',
+    'PUPPETDB_SSL_VERIFY=/etc/puppetboard/ca.pem',
     'PUPPETDB_KEY=/etc/puppetboard/key.pem',
     'PUPPETDB_CERT=/etc/puppetboard/cert.pem',
     'SECRET_KEY=XXXXXXXX',
+    'ENABLE_CATALOG=true',
     'DEFAULT_ENVIRONMENT=*',
   ],
   net     => 'host',
 }
 ```
 
-Within an air gapped environment you want to load all content from your local puppetboard web service.
-Add: `'OFFLINE_MODE=true',` to the `env` parameter list of the `docker::run` Puppet type.
+In an air-gapped network add `'OFFLINE_MODE=true'` to `env`, so the browser
+loads the JavaScript and fonts from Puppetboard instead of a CDN.
 
 To build the image yourself from a checkout: `docker build -t puppetboard .`
 
@@ -182,6 +195,7 @@ reverse proxy also needs `setsebool -P httpd_can_network_connect 1`.
 
 Under a URL prefix such as `https://example.com/puppetboard/`, add
 `--root-path /puppetboard` to gunicorn (container: `PUPPETBOARD_URL_PREFIX`).
+All container variables: [Configuration](Configuration.md#container-variables).
 
 ## nginx
 
