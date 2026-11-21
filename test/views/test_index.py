@@ -24,6 +24,8 @@ def test_get_index(client, mocker,
     assert 'very-compact' in soup.select_one('#main-table')['class']
     charts = [c['data-metric'] for c in soup.select('.run-times-chart')]
     assert charts == ['catalog_application', 'fact_generation']
+    for toggle in ('.daily-reports-chart-range-toggle', '.run-times-range-toggle'):
+        assert [b['data-range-value'] for b in soup.select(toggle + ' button')] == ['today', 'days']
 
 
 def test_index_all(client, mocker,

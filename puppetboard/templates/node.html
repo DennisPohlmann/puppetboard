@@ -52,6 +52,10 @@
       {% if config.DAILY_REPORTS_CHART_ENABLED %}
         <div id="dailyReportsChartContainer" class="one column row">
         <div class="daily-reports-chart-toolbar">
+          <div class="ui tiny buttons daily-reports-chart-range-toggle" aria-label="Daily reports chart range">
+            <button type="button" class="ui button" data-range-value="today">24 hours</button>
+            <button type="button" class="ui button" data-range-value="days">{{ config.DAILY_REPORTS_CHART_DAYS }} days</button>
+          </div>
           <div class="ui tiny buttons daily-reports-chart-mode-toggle" aria-label="Daily reports chart mode">
             <button type="button" class="ui button" data-chart-mode-value="stacked">Stacked</button>
             <button type="button" class="ui button" data-chart-mode-value="split">Split</button>

@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 from puppetboard import app
 from test import MockDbQuery
@@ -91,3 +91,45 @@ def test_run_times_chart_query_filters_environment():
     get_run_times_chart(Db(), '*', 1)
     assert 'environment' not in seen[0]
 
+
+
+def test_json_daily_reports_chart_today_by_hour(client, mocker,
+                                                mock_puppetdb_environments,
+                                                mock_puppetdb_default_nodes):
+    mocker.patch.object(app.puppetdb, '_query',
+                        side_effect=MockDbQuery({'reports': [[{'status': 'failed', 'count': 2}]] * 24}).get)
+
+    result = json.loads(client.get('/daily_reports_chart.json?range=today').data)['result']
+
+    assert len(result) == 24
+    hours = [datetime.strptime(row['day'], '%Y-%m-%dT%H:%M:%SZ') for row in result]
+    assert all((b - a).total_seconds() == 3600 for a, b in zip(hours, hours[1:]))
+    assert hours[-1] <= datetime.now(timezone.utc).replace(tzinfo=None) < hours[-1].replace(minute=59, second=59)
+    assert result[0]['failed'] == 2
+
+
+def test_json_run_times_chart_today_by_hour(client, mocker,
+                                            mock_puppetdb_environments,
+                                            mock_puppetdb_default_nodes):
+    mocker.patch.object(app.puppetdb, '_query',
+                        side_effect=MockDbQuery({'reports': [[_report(4, 2)]] * 24}).get)
+
+    result = json.loads(client.get('/run_times_chart.json?range=today').data)['result']
+
+    assert len(result) == 24
+    assert result[-1]['day'].endswith(':00:00Z')
+    assert result[-1]['catalog_application'] == {'min': 4, 'max': 4, 'avg': 4}
+
+
+def test_hourly_ranges_query_each_hour():
+    from puppetboard.views.dailychart import get_daily_reports_chart
+
+    seen = []
+
+    class Db:
+        def _query(self, endpoint, query):
+            seen.append(str(query))
+            return []
+
+    get_daily_reports_chart(Db(), '*', 8, hourly=True)
+    assert len(seen) == 24

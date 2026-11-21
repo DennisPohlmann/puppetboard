@@ -2,21 +2,36 @@ jQuery(function ($) {
   const chartElement = $("#dailyReportsChart");
   const toggleButtons = $(".daily-reports-chart-mode-toggle button");
   const chartModeStorageKey = "dailyReportsChartMode";
+  const rangeButtons = $(".daily-reports-chart-range-toggle button");
+  const rangeStorageKey = "dailyReportsChartRange";
   let url = "daily_reports_chart.json";
   let certname = chartElement.data("certname");
   let days = parseInt(chartElement.data("days"));
   let chartMode = localStorage.getItem(chartModeStorageKey) || chartElement.data("chart-mode") || "stacked";
+  let range = localStorage.getItem(rangeStorageKey) || "days";
   let chart = null;
   let chartData = null;
-  let defaultJSON = []
+  let defaultJSON = emptyData(range);
 
-  for (let index = days-1; index >= 0; index--) {
-    defaultJSON.push({
-      day: moment().startOf('day').subtract(index, 'days').format('YYYY-MM-DD'),
-      unchanged: 0,
-      changed: 0,
-      failed: 0
-    })
+  // zero bars until the data is there: one per day, or per hour of the last 24 hours
+  function emptyData(range) {
+    let rows = [];
+    for (let index = (range === "today" ? 23 : days - 1); index >= 0; index--) {
+      rows.push({
+        day: range === "today"
+          ? moment.utc().startOf('hour').subtract(index, 'hours').format('YYYY-MM-DDTHH:mm:ss[Z]')
+          : moment().startOf('day').subtract(index, 'days').format('YYYY-MM-DD'),
+        unchanged: 0,
+        changed: 0,
+        failed: 0
+      });
+    }
+    return rows;
+  }
+
+  // hourly labels are UTC hour starts; show them as local clock time
+  function xTick(index, label) {
+    return range === "today" ? moment(label).format("HH:mm") : label;
   }
 
   // Get chart colors from CSS variables (supports dark mode)
@@ -83,6 +98,12 @@ jQuery(function ($) {
       axis: {
         x: {
           type: "category",
+          tick: {
+            format: xTick,
+            // 24 hourly labels do not fit on a phone; show every few
+            culling: range === "today" ? {max: 8} : false,
+            multiline: range !== "today",
+          },
         },
         y: splitMode ? {
           label: {
@@ -94,7 +115,11 @@ jQuery(function ($) {
           tick: {
             format: integerTick,
           },
-        } : undefined,
+        } : {
+          tick: {
+            culling: {max: 6},
+          },
+        },
         y2: splitMode ? {
           show: true,
           label: {
@@ -117,6 +142,8 @@ jQuery(function ($) {
   function updateModeButtons(mode) {
     toggleButtons.removeClass("active");
     toggleButtons.filter("[data-chart-mode-value='" + mode + "']").addClass("active");
+    rangeButtons.removeClass("active");
+    rangeButtons.filter("[data-range-value='" + range + "']").addClass("active");
   }
 
   function renderChart(mode, data) {
@@ -137,6 +164,22 @@ jQuery(function ($) {
       certname
   }
 
+  function load() {
+    $.getJSON(url + (url.indexOf("?") < 0 ? "?" : "&") + "range=" + range, function(data) {
+      chartData = data.result;
+      renderChart(chartMode, chartData);
+    });
+  }
+
+  rangeButtons.on("click", function() {
+    range = $(this).data("range-value");
+    localStorage.setItem(rangeStorageKey, range);
+    defaultJSON = emptyData(range);
+    chartData = null;
+    renderChart(chartMode, defaultJSON);
+    load();
+  });
+
   toggleButtons.on("click", function() {
     chartMode = $(this).data("chart-mode-value");
     localStorage.setItem(chartModeStorageKey, chartMode);
@@ -144,9 +187,5 @@ jQuery(function ($) {
   });
 
   renderChart(chartMode, defaultJSON);
-
-  $.getJSON(url, function(data) {
-    chartData = data.result;
-    renderChart(chartMode, chartData);
-  });
+  load();
 })

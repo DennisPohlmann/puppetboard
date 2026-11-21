@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from flask import (
     request, jsonify
@@ -37,6 +37,7 @@ def daily_reports_chart(env):
         env=env,
         days_number=app.config['DAILY_REPORTS_CHART_DAYS'],
         certname=certname,
+        hourly=_hourly(),
     )
     return jsonify(result=result)
 
@@ -53,6 +54,26 @@ def _iter_dates(days_number, reverse=False):
         days_list.reverse()
         return zip(days_list, days_list[1:])
     return zip(days_list[1:], days_list)
+
+
+def _hourly():
+    """True when the chart asks for the last 24 hours by the hour (?range=today)."""
+    return request.args.get('range') == 'today'
+
+
+def _iter_ranges(days_number, hourly):
+    """Return (label, start, end) for each bar: the last 24 hours, or the
+       last N days.
+    """
+    if hourly:
+        # the last 24 hours up to the end of this hour, labelled with the UTC
+        # start of each hour so the browser can show it in local time
+        one_hour = timedelta(hours=1)
+        end = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0) + one_hour
+        return [((end - one_hour * h).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                 end - one_hour * h, end - one_hour * (h - 1)) for h in range(24, 0, -1)]
+    return [(start.strftime(DATE_FORMAT), start, end)
+            for start, end in _iter_dates(days_number, reverse=True)]
 
 
 def _build_query(env, start, end, certname=None):
@@ -85,7 +106,7 @@ def _format_report_data(day, query_output):
     return result
 
 
-def get_daily_reports_chart(db, env, days_number, certname=None):
+def get_daily_reports_chart(db, env, days_number, certname=None, hourly=False):
     """Return the sum of each report status (changed, unchanged, failed)
        per day, for today and the previous N days.
 
@@ -97,21 +118,21 @@ def get_daily_reports_chart(db, env, days_number, certname=None):
     :param certname: If certname is passed, only the reports of that
     certname will be added.  If certname is not passed, all reports in
     the database will be considered.
+    :param hourly: Sum per hour of the last 24 hours instead of per day.
     """
-    def one_day(day_range):
-        start, end = day_range
+    def one_range(label_range):
+        label, start, end = label_range
         query = _build_query(
             env=env,
             start=start.strftime(DATETIME_FORMAT),
             end=end.strftime(DATETIME_FORMAT),
             certname=certname,
         )
-        return _format_report_data(start.strftime(DATE_FORMAT),
-                                   db._query('reports', query=query))
+        return _format_report_data(label, db._query('reports', query=query))
 
-    # one count query per day; run them side by side instead of one after another
-    with ThreadPoolExecutor(max_workers=min(days_number, 8) or 1) as pool:
-        return list(pool.map(one_day, _iter_dates(days_number, reverse=True)))
+    # one count query per bar; run them side by side instead of one after another
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return list(pool.map(one_range, _iter_ranges(days_number, hourly)))
 
 
 # agent report metrics in the 'time' category, in seconds
@@ -128,6 +149,7 @@ def run_times_chart(env):
         db=puppetdb,
         env=env,
         days_number=app.config['DAILY_REPORTS_CHART_DAYS'],
+        hourly=_hourly(),
     )
     return jsonify(result=result)
 
@@ -150,13 +172,13 @@ def _format_run_times(day, reports):
     return result
 
 
-def get_run_times_chart(db, env, days_number):
+def get_run_times_chart(db, env, days_number, hourly=False):
     """Return min, max and mean of the catalog application and fact
        generation time over all agent reports, per day, for today and the
-       previous N days.
+       previous N days, or per hour of the last 24 hours when hourly is set.
     """
-    def one_day(day_range):
-        start, end = day_range
+    def one_range(label_range):
+        label, start, end = label_range
         query = ExtractOperator()
         query.add_field('metrics')
         subquery = AndOperator()
@@ -165,8 +187,7 @@ def get_run_times_chart(db, env, days_number):
         if env != '*':
             subquery.add(EqualsOperator('environment', env))
         query.add_query(subquery)
-        return _format_run_times(start.strftime(DATE_FORMAT),
-                                 db._query('reports', query=query))
+        return _format_run_times(label, db._query('reports', query=query))
 
-    with ThreadPoolExecutor(max_workers=min(days_number, 8) or 1) as pool:
-        return list(pool.map(one_day, _iter_dates(days_number, reverse=True)))
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return list(pool.map(one_range, _iter_ranges(days_number, hourly)))

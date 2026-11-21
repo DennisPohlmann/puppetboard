@@ -4,6 +4,10 @@ jQuery(function ($) {
     return;
   }
 
+  const rangeButtons = $(".run-times-range-toggle button");
+  const rangeStorageKey = "runTimesChartRange";
+  let range = localStorage.getItem(rangeStorageKey) || "days";
+
   function getColors() {
     var style = getComputedStyle(document.documentElement);
     return {
@@ -30,8 +34,10 @@ jQuery(function ($) {
       size: {height: 200},
       line: {connectNull: false},
       axis: {
-        // MM-DD keeps the labels on one line on phones
-        x: {type: "category", tick: {format: function (index, day) { return day.slice(5); }}},
+        // MM-DD keeps the labels on one line on phones; hours are UTC, shown in local time
+        x: {type: "category", tick: {format: function (index, label) {
+          return range === "today" ? moment(label).format("HH:mm") : label.slice(5);
+        }, culling: range === "today" ? {max: 8} : false, multiline: false}},
         y: {
           min: 0,
           padding: {bottom: 0},
@@ -49,9 +55,21 @@ jQuery(function ($) {
     });
   }
 
-  $.getJSON("run_times_chart.json", function (data) {
-    charts.each(function () {
-      render(this, data.result);
+  function load() {
+    rangeButtons.removeClass("active");
+    rangeButtons.filter("[data-range-value='" + range + "']").addClass("active");
+    $.getJSON("run_times_chart.json?range=" + range, function (data) {
+      charts.each(function () {
+        render(this, data.result);
+      });
     });
+  }
+
+  rangeButtons.on("click", function () {
+    range = $(this).data("range-value");
+    localStorage.setItem(rangeStorageKey, range);
+    load();
   });
+
+  load();
 });

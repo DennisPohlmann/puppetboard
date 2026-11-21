@@ -897,10 +897,17 @@ h1.ui.header.no-margin-bottom {
 .daily-reports-chart-toolbar {
   display: flex;
   justify-content: flex-end;
+  gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
-.daily-reports-chart-mode-toggle .button.active {
+#runTimesChartContainer > .daily-reports-chart-toolbar {
+  padding-bottom: 1.5rem;
+}
+
+.daily-reports-chart-mode-toggle .button.active,
+.daily-reports-chart-range-toggle .button.active,
+.run-times-range-toggle .button.active {
   background: var(--color-darkblue);
   color: #fff;
 }

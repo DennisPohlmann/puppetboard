@@ -78,6 +78,10 @@
   {% if config.DAILY_REPORTS_CHART_ENABLED %}
   <div id="dailyReportsChartContainer" class="one column row">
     <div class="daily-reports-chart-toolbar">
+      <div class="ui tiny buttons daily-reports-chart-range-toggle" aria-label="Daily reports chart range">
+        <button type="button" class="ui button" data-range-value="today">24 hours</button>
+        <button type="button" class="ui button" data-range-value="days">{{ config.DAILY_REPORTS_CHART_DAYS }} days</button>
+      </div>
       <div class="ui tiny buttons daily-reports-chart-mode-toggle" aria-label="Daily reports chart mode">
         <button type="button" class="ui button" data-chart-mode-value="stacked">Stacked</button>
         <button type="button" class="ui button" data-chart-mode-value="split">Split</button>
@@ -88,6 +92,12 @@
          data-chart-mode="{{ config.DAILY_REPORTS_CHART_MODE }}"></div>
   </div>
   <div id="runTimesChartContainer" class="row">
+    <div class="sixteen wide column daily-reports-chart-toolbar">
+      <div class="ui tiny buttons run-times-range-toggle" aria-label="Run time charts range">
+        <button type="button" class="ui button" data-range-value="today">24 hours</button>
+        <button type="button" class="ui button" data-range-value="days">{{ config.DAILY_REPORTS_CHART_DAYS }} days</button>
+      </div>
+    </div>
     <div class="sixteen wide mobile eight wide computer column">
       <h3 class="ui header">Catalog application time</h3>
       <div class="run-times-chart" data-metric="catalog_application"></div>
