@@ -48,5 +48,7 @@ def test_node_view(client, mocker,
     assert len(vals) == 1
     # report rows as compact as on the overview
     assert 'very-compact' in vals[0]['class']
+    # half-width column: the date may wrap
+    assert 'nowrap-date' not in vals[0]['class']
     scripts = [t['src'] for t in soup.select('script[src]')]
     assert scripts.count('/static/js/dailychart.js') == 1

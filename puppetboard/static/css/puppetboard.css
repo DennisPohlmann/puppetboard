@@ -1035,15 +1035,14 @@ td.code {
     padding-right: 3em;
   }
 
-  /* report lists: the date stays on one line; the counts wrap only
-     where the column is too narrow (node page below ~1300px) */
-  #reports_table.very-compact > tbody > tr > td:first-child {
+  /* report lists: status label and counts on one line, as on the
+     overview; the date wraps where the node page column is too narrow */
+  #reports_table.very-compact > tbody > tr > td:nth-child(2) {
     white-space: nowrap;
   }
 
-  /* narrower status label so date and all counts fit on one line in the
-     half-width report list of the node page */
-  #reports_table.very-compact .status {
-    width: 10em;
+  /* the full-width reports page has room for the date on one line too */
+  #reports_table.nowrap-date > tbody > tr > td:first-child {
+    white-space: nowrap;
   }
 }

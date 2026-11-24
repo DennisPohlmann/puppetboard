@@ -185,10 +185,12 @@ def test_environment_menu_css_keeps_long_names_in_view():
     assert 'overflow-wrap: anywhere' in item
 
 
-def test_report_lists_keep_date_on_one_line_on_desktop():
+def test_report_lists_show_status_like_the_overview_on_desktop():
     css = (Path(__file__).parent.parent / 'puppetboard' / 'static' / 'css'
            / 'puppetboard.css').read_text()
     media = css.split('@media only screen and (min-width: 768px) {\n  #main-table')[1]
     media = media.split('\n}\n')[0]
-    assert '#reports_table.very-compact > tbody > tr > td:first-child {\n    white-space: nowrap;' in media
-    assert '#reports_table.very-compact .status' in media
+    # status label and counts on one line, label as wide as on the overview
+    assert '#reports_table.very-compact > tbody > tr > td:nth-child(2) {\n    white-space: nowrap;' in media
+    assert '#reports_table.nowrap-date > tbody > tr > td:first-child {\n    white-space: nowrap;' in media
+    assert '#reports_table.very-compact .status' not in css
