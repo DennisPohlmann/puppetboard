@@ -1,5 +1,5 @@
 -r requirements-docker.txt
-coverage==7.17.4
+coverage==7.17.5
 mockey
 pytest==9.2.0
 pylint==4.1.4

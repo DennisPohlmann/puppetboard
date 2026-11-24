@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 - Updated the Scalar API reference on `/api/v1/docs` from 1.77.0 to 1.83.0.
 - Updated DataTables to 3.1.6 and DataTables Buttons to 4.1.4.
+- Updated charset-normalizer to 3.5.3, packaging to 26.4 and sse-starlette to 3.7.1.
 - The run time charts on the overview load fast after the first load: each Puppetboard process keeps the run
   times per hour and asks PuppetDB again only for the last two hours. Before, every page load (also the automatic
   refresh) fetched the metrics of all reports of the last days, which took long on big fleets. A refresh while the
