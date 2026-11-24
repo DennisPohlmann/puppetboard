@@ -697,6 +697,17 @@ h1.ui.header.no-margin-bottom {
   padding: 0.3em 0.7em;
 }
 
+/* reports icon at the end of the Report cell, so that column and its sort
+   arrow reach the right edge of the overview table; date and icon stay on
+   one line, which keeps phone rows low */
+#main-table .report-cell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5em;
+  white-space: nowrap;
+}
+
 .factlist li {
   word-wrap: break-word;
 }

@@ -22,6 +22,13 @@ def test_get_index(client, mocker,
     # DataTables drops the second "very" from the class list, so the
     # compact row padding hangs on the extra very-compact class
     assert 'very-compact' in soup.select_one('#main-table')['class']
+    # Report is the last column, so its sort arrow sits at the right edge;
+    # the reports icon lives inside the Report cell
+    headers = [th.get_text(strip=True) for th in soup.select('#main-table thead th')]
+    assert headers == ['Status', 'Certname', 'Report']
+    for row in soup.select('#main-table tbody tr'):
+        assert len(row.find_all('td', recursive=False)) == 3
+    assert soup.select('#main-table td:last-child .report-cell a.reports-link')
     charts = [c['data-metric'] for c in soup.select('.run-times-chart')]
     assert charts == ['catalog_application', 'fact_generation']
     # each chart script once, or every chart is drawn and fetched twice
