@@ -1,6 +1,6 @@
 [project]
 name = "puppetboard-dp"
-version = "9.0.0"
+version = "9.1.0"
 description = "Web frontend, read-only JSON API and MCP server for PuppetDB (fork of puppetboard)"
 authors = [
     { name = "Vox Pupuli", email = "voxpupuli@groups.io" },

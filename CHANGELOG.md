@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## [9.1.0](https://github.com/DennisPohlmann/puppetboard/tree/9.1.0) (2026-11-24)
 
 **Added**
 

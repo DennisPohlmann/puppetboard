@@ -7,7 +7,7 @@ Server and the agents are yours.
 Released versions are on ghcr.io as OCI chart, with the same version as the app:
 
 ```bash
-helm install puppetboard oci://ghcr.io/dennispohlmann/charts/puppetboard --version 9.0.0 \
+helm install puppetboard oci://ghcr.io/dennispohlmann/charts/puppetboard --version 9.1.0 \
   --namespace puppetboard --create-namespace \
   --set secretKey="$(openssl rand -hex 32)" \
   --set puppetdb.host=puppetdb.example.com \
