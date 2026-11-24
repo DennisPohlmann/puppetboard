@@ -17,6 +17,15 @@ All notable changes to this project will be documented in this file.
   times per hour and asks PuppetDB again only for the last two hours. Before, every page load (also the automatic
   refresh) fetched the metrics of all reports of the last days, which took long on big fleets. A refresh while the
   first load is still running waits for it instead of starting over.
+- The report lists on the node page and the reports page use the compact row height of the overview, so a
+  report row fits on one line on desktop.
+- Overview: the report book icon sits at the end of the Report cell instead of its own column, so the Report sort
+  arrow is at the right edge of the table and phone rows are lower.
+
+**Fixed**
+
+- The run time chart data of an environment that does not exist answers 404 instead of adding a cache entry
+  for every made-up environment name.
 
 ## [9.0.0](https://github.com/DennisPohlmann/puppetboard/tree/9.0.0) (2026-11-21)
 

@@ -41,7 +41,7 @@ Compose examples.
 - **Run times on the overview:** charts of the fastest, slowest and average catalog application and fact
   generation time per day, and a switch for all overview charts between the last 24 hours and the last days.
 - **Faster with many nodes:** quicker facts overview, failures, inventory, nodes and daily chart; the
-  environment list is cached for 60 seconds.
+  environment list is cached for 60 seconds and the run time charts per hour.
 - **Current libraries:** DataTables, Fomantic-UI, jQuery, billboard.js and the Python dependencies kept up
   to date; Python 3.12 to 3.15.
 
