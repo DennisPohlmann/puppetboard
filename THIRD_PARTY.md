@@ -13,7 +13,7 @@ are compatible with Apache-2.0; the full texts are at the linked URLs.
 | Open Sans font (`fonts/open-sans`) | | SIL OFL 1.1 | https://fonts.google.com/specimen/Open+Sans/license |
 | Cousine font (`fonts/cousine`) | | Apache-2.0 | https://fonts.google.com/specimen/Cousine/license |
 | DataTables | 3.1.6 | MIT | https://datatables.net/license/ |
-| DataTables Buttons | 4.1.3 | MIT | https://datatables.net/license/ |
+| DataTables Buttons | 4.1.4 | MIT | https://datatables.net/license/ |
 | billboard.js (includes D3, ISC) | 4.1.5 | MIT | https://github.com/naver/billboard.js/blob/master/LICENSE |
 | Moment.js | 2.31.0 | MIT | https://github.com/moment/moment/blob/develop/LICENSE |
 | Scalar API Reference (`libs/scalar/standalone.js`, includes Vue and other MIT/ISC/BSD code) | 1.83.0 | MIT | https://github.com/scalar/scalar/blob/main/LICENSE |
