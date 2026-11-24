@@ -183,3 +183,12 @@ def test_environment_menu_css_keeps_long_names_in_view():
     assert '100vw' in menu
     item = css.split('.ui.select-environment.selection.dropdown .menu > .item {')[1].split('}')[0]
     assert 'overflow-wrap: anywhere' in item
+
+
+def test_report_lists_keep_date_on_one_line_on_desktop():
+    css = (Path(__file__).parent.parent / 'puppetboard' / 'static' / 'css'
+           / 'puppetboard.css').read_text()
+    media = css.split('@media only screen and (min-width: 768px) {\n  #main-table')[1]
+    media = media.split('\n}\n')[0]
+    assert '#reports_table.very-compact > tbody > tr > td:first-child {\n    white-space: nowrap;' in media
+    assert '#reports_table.very-compact .status' in media

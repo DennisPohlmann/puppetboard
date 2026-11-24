@@ -88,3 +88,8 @@ def test_reports__a_report(client, mocker,
 
     vals = soup.find_all('table', {"id": "events_table"})
     assert len(vals) == 1
+
+
+def test_reports_list_rows_are_compact(client, mock_puppetdb_environments):
+    soup = BeautifulSoup(client.get('/reports').data, 'html.parser')
+    assert 'very-compact' in soup.select_one('#reports_table')['class']
