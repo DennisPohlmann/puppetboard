@@ -1,3 +1,6 @@
+import base64
+import hashlib
+import re
 import tomllib
 
 import pytest
@@ -63,3 +66,34 @@ def test_vendored_scalar_matches_third_party_version():
     version = row.split('|')[2].strip()
     bundle = (root / 'puppetboard' / 'static' / 'libs' / 'scalar' / 'standalone.js').read_text()
     assert f'@scalar/api-reference@{version}`' in bundle
+
+
+def test_offline_libs_match_their_integrity_hashes():
+    # a lib update that forgets the SRI hash breaks the page silently in the browser
+    static = PYPROJECT.parent / 'puppetboard' / 'static'
+    offline = (PYPROJECT.parent / 'puppetboard' / 'templates' / '_static_offline.html').read_text()
+    pairs = re.findall(r"filename='(libs/[^']+)'\) ?}}[\"'] +integrity=\"(sha512-[^\"]+)\"", offline)
+    assert len(pairs) == 13
+    for path, sri in pairs:
+        digest = base64.b64encode(hashlib.sha512((static / path).read_bytes()).digest()).decode()
+        assert sri == f'sha512-{digest}', path
+
+
+def test_online_and_offline_libs_use_the_same_files():
+    templates = PYPROJECT.parent / 'puppetboard' / 'templates'
+    online = set(re.findall(r'integrity="(sha512-[^"]+)"', (templates / '_static_online.html').read_text()))
+    offline = set(re.findall(r'integrity="(sha512-[^"]+)"', (templates / '_static_offline.html').read_text()))
+    assert online == offline
+
+
+@pytest.mark.parametrize('component, path', [
+    ('DataTables', 'datatables.net/dataTables.min.js'),
+    ('DataTables Buttons', 'datatables.net-buttons/dataTables.buttons.min.js'),
+])
+def test_vendored_datatables_match_third_party_version(component, path):
+    root = PYPROJECT.parent
+    row = next(line for line in (root / 'THIRD_PARTY.md').read_text().splitlines()
+               if line.startswith(f'| {component} |'))
+    version = row.split('|')[2].strip()
+    assert f' {version}' in (root / 'puppetboard' / 'static' / 'libs' / path).read_text()[:200]
+    assert f'/{path.split("/")[0]}/{version}/' in (root / 'puppetboard' / 'templates' / '_static_online.html').read_text()
