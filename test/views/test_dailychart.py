@@ -101,6 +101,18 @@ def test_json_run_times_chart_no_metrics_gives_gaps(client, mocker,
                for day in result)
 
 
+def test_json_run_times_chart_unknown_environment_is_404(client, mocker,
+                                                        mock_puppetdb_environments,
+                                                        mock_puppetdb_default_nodes):
+    db = ReportsDb([])
+    mocker.patch.object(app.puppetdb, '_query', side_effect=db._query)
+
+    assert client.get('/nosuchenv/run_times_chart.json').status_code == 404
+    assert client.get('/staging/run_times_chart.json').status_code == 200
+    assert client.get('/*/run_times_chart.json').status_code == 200
+    assert set(dailychart._run_times_cache) == {'staging', '*'}
+
+
 def test_run_times_chart_query_filters_environment():
     db = ReportsDb([])
     dailychart.get_run_times_chart(db, 'production', 2)

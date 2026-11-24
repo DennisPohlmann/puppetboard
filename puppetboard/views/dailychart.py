@@ -11,8 +11,8 @@ from pypuppetdb.QueryBuilder import (ExtractOperator, AndOperator,
 from pypuppetdb.QueryBuilder import (LessOperator)
 from pypuppetdb.utils import UTC
 
-from puppetboard.core import get_app, get_puppetdb
-from puppetboard.utils import (get_or_abort)
+from puppetboard.core import get_app, get_puppetdb, environments
+from puppetboard.utils import check_env, get_or_abort
 
 app = get_app()
 puppetdb = get_puppetdb()
@@ -145,6 +145,8 @@ RUN_TIME_METRICS = ('catalog_application', 'fact_generation')
 @app.route('/<env>/run_times_chart.json')
 def run_times_chart(env):
     """Return JSON data for the run time charts on the overview."""
+    # the cache keeps data per environment, so unknown names must not reach it
+    check_env(env, environments())
     result = get_or_abort(
         get_run_times_chart,
         db=puppetdb,
