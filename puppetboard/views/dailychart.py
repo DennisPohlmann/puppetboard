@@ -1,3 +1,4 @@
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 
@@ -154,22 +155,64 @@ def run_times_chart(env):
     return jsonify(result=result)
 
 
-def _format_run_times(day, reports):
-    """Min, max and mean of each run time metric over the reports of a day."""
-    values = {name: [] for name in RUN_TIME_METRICS}
+# Run time stats per UTC hour and environment: {env: {hour: {metric: [min, max, sum, count]}}}.
+# Fetching every report's metrics is slow on big fleets, so each hour is fetched
+# once it is over and kept; only the hours still open are asked for again.
+_run_times_cache: dict = {}
+_run_times_lock = threading.Lock()
+# reports of an hour can still arrive a while after it ends
+RUN_TIMES_SETTLE = timedelta(hours=1)
+ONE_HOUR = timedelta(hours=1)
+
+
+def _hour_stats(reports):
+    """Min, max, sum and count of each run time metric per hour of producer_timestamp."""
+    hours = {}
     for report in reports:
+        hour = datetime.fromisoformat(report['producer_timestamp']).replace(minute=0, second=0, microsecond=0)
+        stats = hours.setdefault(hour, {})
         for metric in (report.get('metrics') or {}).get('data') or []:
-            if metric.get('category') == 'time' and metric.get('name') in values:
-                values[metric['name']].append(metric['value'])
+            name = metric.get('name')
+            if metric.get('category') == 'time' and name in RUN_TIME_METRICS:
+                value = metric['value']
+                seen = stats.get(name)
+                stats[name] = ([min(seen[0], value), max(seen[1], value), seen[2] + value, seen[3] + 1]
+                               if seen else [value, value, value, 1])
+    return hours
+
+
+def _format_run_times(day, hour_stats):
+    """Min, max and mean of each run time metric over the given hours."""
     result = {'day': day}
-    for name, seen in values.items():
+    for name in RUN_TIME_METRICS:
+        seen = [stats[name] for stats in hour_stats if name in stats]
         # None leaves a gap in the chart instead of a fake zero
         result[name] = {
-            'min': round(min(seen), 2) if seen else None,
-            'max': round(max(seen), 2) if seen else None,
-            'avg': round(sum(seen) / len(seen), 2) if seen else None,
+            'min': round(min(s[0] for s in seen), 2) if seen else None,
+            'max': round(max(s[1] for s in seen), 2) if seen else None,
+            'avg': round(sum(s[2] for s in seen) / sum(s[3] for s in seen), 2) if seen else None,
         }
     return result
+
+
+def _fetch_hours(db, env, start, end):
+    """Run time stats of each hour from start to end, empty hours included."""
+    query = ExtractOperator()
+    query.add_field('producer_timestamp')
+    query.add_field('metrics')
+    subquery = AndOperator()
+    subquery.add(GreaterEqualOperator('producer_timestamp', start.strftime(DATETIME_FORMAT)))
+    subquery.add(LessOperator('producer_timestamp', end.strftime(DATETIME_FORMAT)))
+    if env != '*':
+        subquery.add(EqualsOperator('environment', env))
+    query.add_query(subquery)
+    found = _hour_stats(db._query('reports', query=query))
+    hours = {}
+    hour = start
+    while hour < end:
+        hours[hour] = found.get(hour, {})
+        hour += ONE_HOUR
+    return hours
 
 
 def get_run_times_chart(db, env, days_number, hourly=False):
@@ -177,17 +220,33 @@ def get_run_times_chart(db, env, days_number, hourly=False):
        generation time over all agent reports, per day, for today and the
        previous N days, or per hour of the last 24 hours when hourly is set.
     """
-    def one_range(label_range):
-        label, start, end = label_range
-        query = ExtractOperator()
-        query.add_field('metrics')
-        subquery = AndOperator()
-        subquery.add(GreaterEqualOperator('producer_timestamp', start.strftime(DATETIME_FORMAT)))
-        subquery.add(LessOperator('producer_timestamp', end.strftime(DATETIME_FORMAT)))
-        if env != '*':
-            subquery.add(EqualsOperator('environment', env))
-        query.add_query(subquery)
-        return _format_run_times(label, db._query('reports', query=query))
+    ranges = _iter_ranges(days_number, hourly)
+    now = datetime.now(timezone.utc)
+    # one request at a time fills the cache, so a reload waits for it instead of asking again
+    with _run_times_lock:
+        cache = _run_times_cache.setdefault(env, {})
+        # both views share the cache, keep what the day view needs
+        oldest = now - timedelta(days=days_number + 1)
+        for hour in [hour for hour in cache if hour < oldest]:
+            del cache[hour]
 
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        return list(pool.map(one_range, _iter_ranges(days_number, hourly)))
+        # spans of consecutive hours that are not cached, at most a day each
+        spans = []
+        hour = ranges[0][1].astimezone(timezone.utc)
+        while hour < min(ranges[-1][2], now):
+            if hour not in cache:
+                if spans and spans[-1][1] == hour and spans[-1][1] - spans[-1][0] < ONE_HOUR * 24:
+                    spans[-1][1] = hour + ONE_HOUR
+                else:
+                    spans.append([hour, hour + ONE_HOUR])
+            hour += ONE_HOUR
+
+        hours = dict(cache)
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            for fetched in pool.map(lambda span: _fetch_hours(db, env, *span), spans):
+                hours.update(fetched)
+                cache.update((hour, stats) for hour, stats in fetched.items()
+                             if hour + ONE_HOUR + RUN_TIMES_SETTLE <= now)
+
+    return [_format_run_times(label, [stats for hour, stats in hours.items() if start <= hour < end])
+            for label, start, end in ranges]
