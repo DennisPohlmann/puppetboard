@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 - Helm chart: `api.docs` sets `API_DOCS`. The proxy Compose example and docs/Configuration.md name `API_DOCS` too.
 
+**Changed**
+
+- Updated the Scalar API reference on `/api/v1/docs` from 1.77.0 to 1.83.0.
+
 ## [9.0.0](https://github.com/DennisPohlmann/puppetboard/tree/9.0.0) (2026-11-21)
 
 **Added**

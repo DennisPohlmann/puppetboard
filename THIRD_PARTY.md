@@ -16,7 +16,7 @@ are compatible with Apache-2.0; the full texts are at the linked URLs.
 | DataTables Buttons | 4.1.3 | MIT | https://datatables.net/license/ |
 | billboard.js (includes D3, ISC) | 4.1.5 | MIT | https://github.com/naver/billboard.js/blob/master/LICENSE |
 | Moment.js | 2.31.0 | MIT | https://github.com/moment/moment/blob/develop/LICENSE |
-| Scalar API Reference (`libs/scalar/standalone.js`, includes Vue and other MIT/ISC/BSD code) | 1.77.0 | MIT | https://github.com/scalar/scalar/blob/main/LICENSE |
+| Scalar API Reference (`libs/scalar/standalone.js`, includes Vue and other MIT/ISC/BSD code) | 1.83.0 | MIT | https://github.com/scalar/scalar/blob/main/LICENSE |
 | JSZip | 3.10.2 | MIT (dual MIT/GPLv3, used under MIT) | https://github.com/Stuk/jszip/blob/main/LICENSE.markdown |
 
 Python dependencies are installed from PyPI and not shipped in this

@@ -55,3 +55,11 @@ def test_requirements_files_are_the_only_dependency_pins():
 def test_workflows_do_not_trigger_on_master():
     for workflow in (PYPROJECT.parent / '.github' / 'workflows').glob('*.yml'):
         assert '- master' not in workflow.read_text(), workflow
+
+
+def test_vendored_scalar_matches_third_party_version():
+    root = PYPROJECT.parent
+    row = next(line for line in (root / 'THIRD_PARTY.md').read_text().splitlines() if 'libs/scalar/' in line)
+    version = row.split('|')[2].strip()
+    bundle = (root / 'puppetboard' / 'static' / 'libs' / 'scalar' / 'standalone.js').read_text()
+    assert f'@scalar/api-reference@{version}`' in bundle
