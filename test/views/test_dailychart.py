@@ -195,8 +195,10 @@ def test_json_daily_reports_chart_today_by_hour(client, mocker,
 def test_json_run_times_chart_today_by_hour(client, mocker,
                                             mock_puppetdb_environments,
                                             mock_puppetdb_default_nodes):
-    mocker.patch.object(app.puppetdb, '_query',
-                        side_effect=ReportsDb([_report(4, 2, timedelta(minutes=1))])._query)
+    # sent at the start of this hour: "a minute ago" lands in the previous hour during the first minute
+    hour_start = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
+    mocker.patch.object(app.puppetdb, '_query', side_effect=ReportsDb(
+        [_report(4, 2, datetime.now(timezone.utc) - hour_start)])._query)
 
     result = json.loads(client.get('/run_times_chart.json?range=today').data)['result']
 
